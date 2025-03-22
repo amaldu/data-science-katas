@@ -43,7 +43,7 @@ class LinkedList:
     
     def add(self,data):
         """
-        Adds new node containing dat aat head of the list
+        Adds new node containing data at the head of the list
         
         Takes O(n) time
         
