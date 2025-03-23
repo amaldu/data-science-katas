@@ -1,3 +1,8 @@
+# Useful when we search names in an unordered list of names
+# Runtime is O(n) because if we have:
+# list = [1,2,3,4,5,6,7,8]
+# if we want to find the number 8, 
+# in the worst case it takes 8 searches one by one until we find it
 def linear_search(list,target):
     """Returns the index position of the target if found, else returns None
     
