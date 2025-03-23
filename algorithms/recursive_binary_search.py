@@ -4,10 +4,12 @@ def recursive_binary_search(list, target):
     
     this a recursive function, a function that calls itself. 
     
-    the aount of times a function calls itself is called recursion depth. 
+    the amount of times a function calls itself is called recursion depth. 
     python has recursion max depth, it prefers iteration
     
     iterative solution = loop structure of some kind
+    
+    Takes overall O(log n) time because every split turns
     """
     if len(list) == 0:
         return False
