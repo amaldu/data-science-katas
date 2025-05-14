@@ -8,8 +8,8 @@ def binary_search(list,target):
         midpoint = (first + last) //2 # "//" rounds to the unit
         
         if list[midpoint] == target:
-            return midpoint
-        elif list[midpoint] < target:
+            return midpoint 
+        elif list[midpoint] < target: 
             first = midpoint + 1
         else:
             last = midpoint - 1
@@ -21,6 +21,9 @@ def verify(index):
         print("Target found at index:", index)
     else:
         print("Target not found in list")
+        
+        
+        
         
 # IMPORTANT! THIS ALGORITHM NEEDS AN ORDERED LIST
 
