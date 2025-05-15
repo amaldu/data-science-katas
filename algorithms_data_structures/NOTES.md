@@ -174,7 +174,6 @@ Does it matter which value of the repeated ones when removing? No, it doesn't if
 
 
 ### Union Find
-
 Is a data structure that keeps track of elements which are split into one or more disjoints sets.
 It has two primary 
 
