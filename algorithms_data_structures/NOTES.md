@@ -179,19 +179,13 @@ Is a data structure that keeps track of elements which are split into one or mor
 It has two primary 
 
 
-
-
 Cheatsheet with running time and space
-
 
 
 Runtime of algorithms seen in this section
 
 Linear search O(n)
 Binary search O(log n) but needs the list to be sorted
-
-
-
 Selection sort O(n²)
 Quicksort O(log n)
 Merge sort O(n log n)
