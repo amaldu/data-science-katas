@@ -10,6 +10,7 @@ If you haven’t initialized the environment yet, run:
 
 ```sh
 poetry install  # Create the environment and install dependencies
+poetry shell
 ```
 
 To verify the environment path:
