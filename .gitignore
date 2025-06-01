@@ -62,8 +62,7 @@ db.sqlite3
 db.sqlite3-journal
 
 # chroma db stuff
-langgraph/agents/r"/home/maldu/dscience/projects/data-science-katas"/
-
+langgraph/agents/r/
 # Flask stuff:
 instance/
 .webassets-cache
