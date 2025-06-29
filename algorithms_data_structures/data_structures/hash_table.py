@@ -1,8 +1,8 @@
 
 
 def ass():
-    only_names = ["Ana", "Mark", "Ass", "Dick"]
-    full_names = [{"Mark", "Fenderov"},{"Ana", "Helena", "Maldonado", "Labara"}]
+    only_names = ["Ana", "Mark", "Tree", "Bush"]
+    full_names = [{"Mark", "Marquez"},{"Ana", "Maria", "Serrano", "Dominguez"}]
 
     name_table = set()
     for name in only_names:
