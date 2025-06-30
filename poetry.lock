@@ -1055,6 +1055,19 @@ files = [
 ]
 
 [[package]]
+name = "docutils"
+version = "0.21.2"
+description = "Docutils -- Python Documentation Utilities"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+markers = "python_version >= \"3.12\" or python_version <= \"3.11\""
+files = [
+    {file = "docutils-0.21.2-py3-none-any.whl", hash = "sha256:dafca5b9e384f0e419294eb4d2ff9fa826435bf15f15b7bd45723e8ad76811b2"},
+    {file = "docutils-0.21.2.tar.gz", hash = "sha256:3a6b18732edf182daa3cd12775bbb338cf5691468f91eeeb109deff6ebfa986f"},
+]
+
+[[package]]
 name = "durationpy"
 version = "0.10"
 description = "Module for converting between datetime.timedelta and Go's Duration strings."
@@ -5488,6 +5501,21 @@ anyio = ">=3.6.2,<5"
 full = ["httpx (>=0.27.0,<0.29.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.18)", "pyyaml"]
 
 [[package]]
+name = "statistics"
+version = "1.0.3.5"
+description = "A Python 2.* port of 3.4 Statistics Module"
+optional = false
+python-versions = "*"
+groups = ["main"]
+markers = "python_version >= \"3.12\" or python_version <= \"3.11\""
+files = [
+    {file = "statistics-1.0.3.5.tar.gz", hash = "sha256:2dc379b80b07bf2ddd5488cad06b2b9531da4dd31edb04dc9ec0dc226486c138"},
+]
+
+[package.dependencies]
+docutils = ">=0.3"
+
+[[package]]
 name = "statsmodels"
 version = "0.14.4"
 description = "Statistical computations and models for Python"
@@ -6682,4 +6710,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "4708566528f4c44f7d8aeac8f0e99f82096424ad62093b4dc151eda80823844f"
+content-hash = "3509bc0c9bd7bbf5af001266b4c2d387b2068f4ed0829e78ed827eb890e5f687"
