@@ -1,0 +1,63 @@
+-- --- 2. Users table --- 
+DROP TABLE IF EXISTS users CASCADE;
+
+-- Table
+CREATE TABLE users (
+    user_id INT PRIMARY KEY, 
+    city VARCHAR(20) NOT NULL,  
+    email VARCHAR(50) NOT NULL, 
+    signup_date TIMESTAMP NOT NULL
+);
+
+-- Values
+INSERT INTO users (user_id, city, email, signup_date) VALUES
+(101, 'Oslo', 'user101@example.com', NOW() - interval '50 days'),
+(102, 'Barcelona', 'user102@example.com', NOW() - interval '49 days'),
+(103, 'Amsterdam', 'user103@example.com', NOW() - interval '48 days'),
+(104, 'Sevilla', 'user104@example.com', NOW() - interval '47 days'),
+(105, 'Berlin', 'user105@example.com', NOW() - interval '46 days'),
+(106, 'Paris', 'user106@example.com', NOW() - interval '45 days'),
+(107, 'Rome', 'user107@example.com', NOW() - interval '44 days'),
+(108, 'Lisbon', 'user108@example.com', NOW() - interval '43 days'),
+(109, 'Madrid', 'user109@example.com', NOW() - interval '42 days'),
+(110, 'London', 'user110@example.com', NOW() - interval '41 days'),
+(111, 'Oslo', 'user111@example.com', NOW() - interval '40 days'),
+(112, 'Barcelona', 'user112@example.com', NOW() - interval '39 days'),
+(113, 'Amsterdam', 'user113@example.com', NOW() - interval '38 days'),
+(114, 'Sevilla', 'user114@example.com', NOW() - interval '37 days'),
+(115, 'Berlin', 'user115@example.com', NOW() - interval '36 days'),
+(116, 'Paris', 'user116@example.com', NOW() - interval '35 days'),
+(117, 'Rome', 'user117@example.com', NOW() - interval '34 days'),
+(118, 'Lisbon', 'user118@example.com', NOW() - interval '33 days'),
+(119, 'Madrid', 'user119@example.com', NOW() - interval '32 days'),
+(120, 'London', 'user120@example.com', NOW() - interval '31 days'),
+(121, 'Oslo', 'user121@example.com', NOW() - interval '30 days'),
+(122, 'Barcelona', 'user122@example.com', NOW() - interval '29 days'),
+(123, 'Amsterdam', 'user123@example.com', NOW() - interval '28 days'),
+(124, 'Sevilla', 'user124@example.com', NOW() - interval '27 days'),
+(125, 'Berlin', 'user125@example.com', NOW() - interval '26 days'),
+(126, 'Paris', 'user126@example.com', NOW() - interval '25 days'),
+(127, 'Rome', 'user127@example.com', NOW() - interval '24 days'),
+(128, 'Lisbon', 'user128@example.com', NOW() - interval '23 days'),
+(129, 'Madrid', 'user129@example.com', NOW() - interval '22 days'),
+(130, 'London', 'user130@example.com', NOW() - interval '21 days'),
+(131, 'Oslo', 'user131@example.com', NOW() - interval '20 days'),
+(132, 'Barcelona', 'user132@example.com', NOW() - interval '19 days'),
+(133, 'Amsterdam', 'user133@example.com', NOW() - interval '18 days'),
+(134, 'Sevilla', 'user134@example.com', NOW() - interval '17 days'),
+(135, 'Berlin', 'user135@example.com', NOW() - interval '16 days'),
+(136, 'Paris', 'user136@example.com', NOW() - interval '15 days'),
+(137, 'Rome', 'user137@example.com', NOW() - interval '14 days'),
+(138, 'Lisbon', 'user138@example.com', NOW() - interval '13 days'),
+(139, 'Madrid', 'user139@example.com', NOW() - interval '12 days'),
+(140, 'London', 'user140@example.com', NOW() - interval '11 days'),
+(141, 'Oslo', 'user141@example.com', NOW() - interval '10 days'),
+(142, 'Barcelona', 'user142@example.com', NOW() - interval '9 days'),
+(143, 'Amsterdam', 'user143@example.com', NOW() - interval '8 days'),
+(144, 'Sevilla', 'user144@example.com', NOW() - interval '7 days'),
+(145, 'Berlin', 'user145@example.com', NOW() - interval '6 days'),
+(146, 'Paris', 'user146@example.com', NOW() - interval '5 days'),
+(147, 'Rome', 'user147@example.com', NOW() - interval '4 days'),
+(148, 'Lisbon', 'user148@example.com', NOW() - interval '3 days'),
+(149, 'Madrid', 'user149@example.com', NOW() - interval '2 days'),
+(150, 'London', 'user150@example.com', NOW() - interval '1 day');
