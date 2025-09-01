@@ -28,16 +28,43 @@ Replace `name-to-display` with a name that is easy to differentiate from the oth
 
 ###  3. Select the Kernel in VSCode
 1. Open any notebook you want to work in
-2. Click on top right Kernel selector
+2. Click on top right `Kernel`
 3. Find the `name-to-display` that you previously decided
 
 
-## Instructions on how to run server for SQL problems
+## Instructions on how to run server for SQL exercises
+
+☝️ You need to install few things before:
+   1. Docker
+   2. Docker extension
+   3. PostgreSQL extension
 
 ### 1. Open the docker-compose.yaml
 
-   ⚠️ Before moving forwards check the image version that better suits you  
+   ⚠️ Before moving forward, check that the image version suits your environment and it's not from the Jurassic
 
-### 2. Click the button to run the service
+### 2. Run the PostgreSQL container by clicking on `▷ Run service`
+### 3. Click on the Elephant (left bar) aka PostgreSQL extension 
+   
+Add a new connection and fill the required fields with the values from `docker-compose.yaml`. Test & Save & Connect.
+
+   <p align="center">
+  <img src="sql/imgs/connect-to-server.png" alt="SQL connect server" width="400" />
+</p>
+
+### 4. Run the script `migrate.py`
+
+```
+poetry run python sql/migrate.py
+```
+Refresh and you should see them:
+
+
+   <p align="center">
+  <img src="sql/imgs/postgres-tables.png" alt="SQL tables" width="300" />
+</p>
+
+Now you can start with the exercises. 
+
 
 
