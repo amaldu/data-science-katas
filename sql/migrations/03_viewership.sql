@@ -1,0 +1,62 @@
+-- --- 3. Viewership table --- 
+DROP TABLE IF EXISTS viewership;
+
+-- Table
+CREATE TABLE IF NOT EXISTS viewership (
+    user_id INT PRIMARY KEY, 
+    device_type VARCHAR(20) NOT NULL,  
+    view_time TIMESTAMP NOT NULL
+);
+
+-- Values
+INSERT INTO viewership (user_id, device_type, view_time) VALUES
+(101, 'mobile',  NOW() - interval '50 days'),
+(102, 'desktop', NOW() - interval '49 days'),
+(103, 'tablet',  NOW() - interval '48 days'),
+(104, 'mobile',  NOW() - interval '47 days'),
+(105, 'desktop', NOW() - interval '46 days'),
+(106, 'tablet',  NOW() - interval '45 days'),
+(107, 'mobile',  NOW() - interval '44 days'),
+(108, 'desktop', NOW() - interval '43 days'),
+(109, 'tablet',  NOW() - interval '42 days'),
+(110, 'mobile',  NOW() - interval '41 days'),
+(111, 'desktop', NOW() - interval '40 days'),
+(112, 'tablet',  NOW() - interval '39 days'),
+(113, 'mobile',  NOW() - interval '38 days'),
+(114, 'desktop', NOW() - interval '37 days'),
+(115, 'tablet',  NOW() - interval '36 days'),
+(116, 'mobile',  NOW() - interval '35 days'),
+(117, 'desktop', NOW() - interval '34 days'),
+(118, 'tablet',  NOW() - interval '33 days'),
+(119, 'mobile',  NOW() - interval '32 days'),
+(120, 'desktop', NOW() - interval '31 days'),
+(121, 'tablet',  NOW() - interval '30 days'),
+(122, 'mobile',  NOW() - interval '29 days'),
+(123, 'desktop', NOW() - interval '28 days'),
+(124, 'tablet',  NOW() - interval '27 days'),
+(125, 'mobile',  NOW() - interval '26 days'),
+(126, 'desktop', NOW() - interval '25 days'),
+(127, 'tablet',  NOW() - interval '24 days'),
+(128, 'mobile',  NOW() - interval '23 days'),
+(129, 'desktop', NOW() - interval '22 days'),
+(130, 'tablet',  NOW() - interval '21 days'),
+(131, 'mobile',  NOW() - interval '20 days'),
+(132, 'desktop', NOW() - interval '19 days'),
+(133, 'tablet',  NOW() - interval '18 days'),
+(134, 'mobile',  NOW() - interval '17 days'),
+(135, 'desktop', NOW() - interval '16 days'),
+(136, 'tablet',  NOW() - interval '15 days'),
+(137, 'mobile',  NOW() - interval '14 days'),
+(138, 'desktop', NOW() - interval '13 days'),
+(139, 'tablet',  NOW() - interval '12 days'),
+(140, 'mobile',  NOW() - interval '11 days'),
+(141, 'desktop', NOW() - interval '10 days'),
+(142, 'tablet',  NOW() - interval '9 days'),
+(143, 'mobile',  NOW() - interval '8 days'),
+(144, 'desktop', NOW() - interval '7 days'),
+(145, 'tablet',  NOW() - interval '6 days'),
+(146, 'mobile',  NOW() - interval '5 days'),
+(147, 'desktop', NOW() - interval '4 days'),
+(148, 'tablet',  NOW() - interval '3 days'),
+(149, 'mobile',  NOW() - interval '2 days'),
+(150, 'desktop', NOW() - interval '1 day');

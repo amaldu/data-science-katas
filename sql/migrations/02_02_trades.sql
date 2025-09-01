@@ -1,4 +1,9 @@
 -- --- 2. Trades table --- 
+DROP TABLE IF EXISTS trades;
+DROP TYPE IF EXISTS status_type;
+
+-- Trade types
+CREATE TYPE status_type AS ENUM ('impression', 'click');
 
 -- Table
 CREATE TABLE IF NOT EXISTS trades (
