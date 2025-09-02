@@ -28,7 +28,7 @@ Replace `name-to-display` with a name that is easy to differentiate from the oth
 
 ###  3. Select the Kernel in VSCode
 1. Open any notebook you want to work in
-2. Click on top right `Kernel`
+2. Click on top right `Select Kernel`
 3. Find the `name-to-display` that you previously decided
 
 
@@ -57,7 +57,7 @@ Add a new connection and fill the required fields with the values from `docker-c
 ```
 poetry run python sql/migrate.py
 ```
-Refresh and you should see them:
+Refresh localhost postgres and you should see them:
 
 
    <p align="center">
