@@ -1,6 +1,6 @@
 -- --- 2. Trades table --- 
-DROP TABLE IF EXISTS trades;
-DROP TYPE IF EXISTS status_type;
+DROP TABLE IF EXISTS trades CASCADE;
+DROP TYPE IF EXISTS status_type CASCADE;
 
 -- Trade types
 CREATE TYPE status_type AS ENUM ('impression', 'click');
@@ -20,9 +20,9 @@ INSERT INTO trades (order_id, user_id, price, quantity, status, timestamp)
 VALUES
     (1, 101, 49.99, 10, 'impression', NOW() - interval '50 days'),
     (2, 102, 75.50, 5, 'click', NOW() - interval '49 days'),
-    (3, 103, 20.00, 15, 'click', NOW() - interval '48 days'),
+    (3, 102, 20.00, 15, 'click', NOW() - interval '48 days'),
     (4, 104, 100.00, 8, 'impression', NOW() - interval '47 days'),
-    (5, 105, 60.25, 20, 'click', NOW() - interval '46 days'),
+    (5, 102, 60.25, 20, 'click', NOW() - interval '46 days'),
     (6, 106, 33.33, 12, 'impression', NOW() - interval '45 days'),
     (7, 101, 85.75, 7, 'click', NOW() - interval '44 days'),
     (8, 102, 42.10, 18, 'impression', NOW() - interval '43 days'),
@@ -39,14 +39,14 @@ VALUES
     (19, 101, 72.25, 10, 'click', NOW() - interval '32 days'),
     (20, 102, 95.50, 7, 'impression', NOW() - interval '31 days'),
     (21, 103, 30.30, 15, 'click', NOW() - interval '30 days'),
-    (22, 104, 60.60, 9, 'impression', NOW() - interval '29 days'),
+    (22, 102, 60.60, 9, 'impression', NOW() - interval '29 days'),
     (23, 105, 80.80, 12, 'click', NOW() - interval '28 days'),
     (24, 106, 55.55, 11, 'impression', NOW() - interval '27 days'),
     (25, 101, 44.44, 14, 'click', NOW() - interval '26 days'),
-    (26, 102, 77.77, 6, 'impression', NOW() - interval '25 days'),
-    (27, 103, 33.33, 18, 'click', NOW() - interval '24 days'),
+    (26, 101, 77.77, 6, 'impression', NOW() - interval '25 days'),
+    (27, 102, 33.33, 18, 'click', NOW() - interval '24 days'),
     (28, 104, 99.99, 5, 'impression', NOW() - interval '23 days'),
-    (29, 105, 50.50, 16, 'click', NOW() - interval '22 days'),
+    (29, 101, 50.50, 16, 'click', NOW() - interval '22 days'),
     (30, 106, 65.65, 8, 'impression', NOW() - interval '21 days'),
     (31, 101, 20.20, 13, 'click', NOW() - interval '20 days'),
     (32, 102, 75.75, 9, 'impression', NOW() - interval '19 days'),
@@ -55,10 +55,10 @@ VALUES
     (35, 105, 55.55, 14, 'click', NOW() - interval '16 days'),
     (36, 106, 66.66, 7, 'impression', NOW() - interval '15 days'),
     (37, 101, 77.77, 11, 'click', NOW() - interval '14 days'),
-    (38, 102, 88.88, 9, 'impression', NOW() - interval '13 days'),
+    (38, 101, 88.88, 9, 'impression', NOW() - interval '13 days'),
     (39, 103, 99.99, 13, 'click', NOW() - interval '12 days'),
     (40, 104, 22.22, 15, 'impression', NOW() - interval '11 days'),
-    (41, 105, 33.33, 8, 'click', NOW() - interval '10 days'),
+    (41, 101, 33.33, 8, 'click', NOW() - interval '10 days'),
     (42, 106, 44.44, 12, 'impression', NOW() - interval '9 days'),
     (43, 101, 55.55, 7, 'click', NOW() - interval '8 days'),
     (44, 102, 66.66, 10, 'impression', NOW() - interval '7 days'),
