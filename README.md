@@ -64,6 +64,9 @@ Refresh localhost postgres and you should see them:
   <img src="sql/imgs/postgres-tables.png" alt="SQL tables" width="300" />
 </p>
 
+
+
+
 Now you can start with the exercises. 
 
 
