@@ -1,0 +1,63 @@
+-- --- Topic rankings table ---
+DROP TABLE IF EXISTS topic_rankings;
+
+-- Table
+CREATE TABLE IF NOT EXISTS topic_rankings (
+    topic_id INT NOT NULL,
+    ranking INT NOT NULL,
+    ranking_date TIMESTAMP NOT NULL
+);
+
+-- Values
+INSERT INTO topic_rankings (topic_id, ranking, ranking_date)
+VALUES
+(3, 5, NOW() - interval '50 days'),
+(1, 8, NOW() - interval '49 days'),
+(6, 3, NOW() - interval '48 days'),
+(2, 7, NOW() - interval '47 days'),
+(4, 2, NOW() - interval '46 days'),
+(5, 9, NOW() - interval '45 days'),
+(1, 4, NOW() - interval '44 days'),
+(6, 6, NOW() - interval '43 days'),
+(3, 1, NOW() - interval '42 days'),
+(2, 10, NOW() - interval '41 days'),
+(5, 3, NOW() - interval '40 days'),
+(4, 5, NOW() - interval '39 days'),
+(6, 7, NOW() - interval '38 days'),
+(1, 2, NOW() - interval '37 days'),
+(3, 8, NOW() - interval '36 days'),
+(2, 6, NOW() - interval '35 days'),
+(5, 4, NOW() - interval '34 days'),
+(4, 9, NOW() - interval '33 days'),
+(6, 1, NOW() - interval '32 days'),
+(1, 10, NOW() - interval '31 days'),
+(3, 5, NOW() - interval '30 days'),
+(2, 8, NOW() - interval '29 days'),
+(5, 3, NOW() - interval '28 days'),
+(4, 7, NOW() - interval '27 days'),
+(6, 2, NOW() - interval '26 days'),
+(1, 9, NOW() - interval '25 days'),
+(3, 4, NOW() - interval '24 days'),
+(2, 6, NOW() - interval '23 days'),
+(5, 1, NOW() - interval '22 days'),
+(4, 10, NOW() - interval '21 days'),
+(6, 3, NOW() - interval '20 days'),
+(1, 5, NOW() - interval '19 days'),
+(3, 7, NOW() - interval '18 days'),
+(2, 2, NOW() - interval '17 days'),
+(5, 8, NOW() - interval '16 days'),
+(4, 6, NOW() - interval '15 days'),
+(6, 4, NOW() - interval '14 days'),
+(1, 9, NOW() - interval '13 days'),
+(3, 1, NOW() - interval '12 days'),
+(2, 10, NOW() - interval '11 days'),
+(5, 3, NOW() - interval '10 days'),
+(4, 5, NOW() - interval '9 days'),
+(6, 7, NOW() - interval '8 days'),
+(1, 2, NOW() - interval '7 days'),
+(3, 8, NOW() - interval '6 days'),
+(2, 6, NOW() - interval '5 days'),
+(5, 4, NOW() - interval '4 days'),
+(4, 9, NOW() - interval '3 days'),
+(6, 1, NOW() - interval '2 days'),
+(1, 10, NOW() - interval '1 day');

@@ -62,7 +62,7 @@ VALUES
     (42, 'Network Engineer', 'Manage networking infrastructure', NOW() - interval '6 days'),
     (4, 'Software Engineer', 'Develop and maintain web applications', NOW() - interval '47 days'),
     (37, 'Data Scientist', 'Analyze datasets and build predictive models', NOW() - interval '14 days'),
-    (38, 'Marketing Specialist', 'Plan and execute marketing campaigns', NOW() - interval '13 days'),
+    (42, 'Marketing Specialist', 'Plan and execute marketing campaigns', NOW() - interval '13 days'),
     (34, 'UX Designer', 'Design user interfaces and experiences', NOW() - interval '17 days'),
     (39, 'Backend Developer', 'Develop server-side logic and APIs', NOW() - interval '12 days'),
     (42, 'Technical Writer', 'Document software and technical processes', NOW() - interval '4 days');
