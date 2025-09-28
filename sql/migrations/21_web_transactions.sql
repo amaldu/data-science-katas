@@ -1,0 +1,65 @@
+-- --- Web Transactions table ---
+DROP TABLE IF EXISTS web_transactions;
+
+-- Table
+CREATE TABLE IF NOT EXISTS web_transactions (
+    transaction_id INT PRIMARY KEY NOT NULL,
+    product_id INT NOT NULL,
+    user_id INT NOT NULL,
+    spend FLOAT NOT NULL,
+    transaction_date TIMESTAMP NOT NULL
+);
+
+-- Values
+INSERT INTO web_transactions (transaction_id, product_id, user_id, spend, transaction_date)
+VALUES
+(1, 101, 1, 25.50, NOW() - interval '50 days'),
+(2, 102, 2, 40.75, NOW() - interval '49 days'),
+(3, 103, 3, 15.25, NOW() - interval '48 days'),
+(4, 104, 4, 60.00, NOW() - interval '47 days'),
+(5, 105, 5, 33.33, NOW() - interval '46 days'),
+(6, 106, 6, 22.50, NOW() - interval '45 days'),
+(7, 101, 1, 44.44, NOW() - interval '44 days'),
+(8, 102, 2, 55.25, NOW() - interval '43 days'),
+(9, 103, 3, 12.50, NOW() - interval '42 days'),
+(10, 104, 4, 66.66, NOW() - interval '41 days'),
+(11, 105, 5, 75.50, NOW() - interval '40 days'),
+(12, 106, 6, 80.00, NOW() - interval '39 days'),
+(13, 101, 1, 30.25, NOW() - interval '38 days'),
+(14, 102, 2, 20.00, NOW() - interval '37 days'),
+(15, 103, 3, 45.75, NOW() - interval '36 days'),
+(16, 104, 4, 50.25, NOW() - interval '35 days'),
+(17, 105, 5, 60.50, NOW() - interval '34 days'),
+(18, 106, 6, 70.00, NOW() - interval '33 days'),
+(19, 101, 1, 80.25, NOW() - interval '32 days'),
+(20, 102, 2, 90.00, NOW() - interval '31 days'),
+(21, 103, 3, 12.75, NOW() - interval '30 days'),
+(22, 104, 4, 15.50, NOW() - interval '29 days'),
+(23, 105, 5, 18.25, NOW() - interval '28 days'),
+(24, 106, 6, 22.75, NOW() - interval '27 days'),
+(25, 101, 1, 33.00, NOW() - interval '26 days'),
+(26, 102, 2, 44.50, NOW() - interval '25 days'),
+(27, 103, 3, 55.75, NOW() - interval '24 days'),
+(28, 104, 4, 60.25, NOW() - interval '23 days'),
+(29, 105, 5, 70.50, NOW() - interval '22 days'),
+(30, 106, 6, 80.75, NOW() - interval '21 days'),
+(31, 101, 1, 90.25, NOW() - interval '20 days'),
+(32, 102, 2, 100.50, NOW() - interval '19 days'),
+(33, 103, 3, 110.75, NOW() - interval '18 days'),
+(34, 104, 4, 120.00, NOW() - interval '17 days'),
+(35, 105, 5, 12.50, NOW() - interval '16 days'),
+(36, 106, 6, 15.75, NOW() - interval '15 days'),
+(37, 101, 1, 18.00, NOW() - interval '14 days'),
+(38, 102, 2, 22.25, NOW() - interval '13 days'),
+(39, 103, 3, 30.50, NOW() - interval '12 days'),
+(40, 104, 4, 40.75, NOW() - interval '11 days'),
+(41, 105, 5, 50.25, NOW() - interval '10 days'),
+(42, 106, 6, 60.50, NOW() - interval '9 days'),
+(43, 101, 1, 70.75, NOW() - interval '8 days'),
+(44, 102, 2, 80.00, NOW() - interval '7 days'),
+(45, 103, 3, 90.25, NOW() - interval '6 days'),
+(46, 104, 4, 100.50, NOW() - interval '5 days'),
+(47, 105, 5, 110.75, NOW() - interval '4 days'),
+(48, 106, 6, 120.00, NOW() - interval '3 days'),
+(49, 101, 1, 12.25, NOW() - interval '2 days'),
+(50, 102, 2, 15.50, NOW() - interval '1 day');
