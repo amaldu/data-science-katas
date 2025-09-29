@@ -1,15 +1,15 @@
 -- --- Topic rankings table ---
-DROP TABLE IF EXISTS topic_rankings;
+DROP TABLE IF EXISTS user_topics;
 
 -- Table
-CREATE TABLE IF NOT EXISTS topic_rankings (
+CREATE TABLE IF NOT EXISTS user_topics (
+    user_id INT NOT NULL,
     topic_id INT NOT NULL,
-    ranking INT NOT NULL,
-    ranking_date TIMESTAMP NOT NULL
+    follow_date TIMESTAMP NOT NULL
 );
 
 -- Values
-INSERT INTO topic_rankings (topic_id, ranking, ranking_date)
+INSERT INTO user_topics (user_id, topic_id, follow_date)
 VALUES
 (3, 5, NOW() - interval '50 days'),
 (1, 8, NOW() - interval '49 days'),
