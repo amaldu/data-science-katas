@@ -15,38 +15,148 @@ Where:
 - $\beta_1, \beta_2, \ldots, \beta_n$ = coefficients (weights)
 - $\varepsilon$ = error term (residuals)
 
-### Visual Intuition
-
-![Linear Regression Best Fit Line](https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Normdist_regression.png/325px-Normdist_regression.png)
-
-*The goal is to find the line that minimizes the total distance between data points and the line.*
-
-## Matrix Form
-
-**Prediction:**
+#### Matrix Form
 
 $$\hat{y} = X\theta$$
 
-**Where:**
+Where:
 - $X$ = feature matrix $(m \times n)$, m samples, n features
 - $\theta$ = parameter vector $[\beta_0, \beta_1, \ldots, \beta_n]^T$
 - $\hat{y}$ = predicted values
+
+### Visual Intuition
+
+![Linear Regression Best Fit Line](images/01_linear_regression_best_fit.png)
+
+*The goal is to find the line that minimizes the total distance between data points and the line.*
+
+### Estimation Method
+
+Linear Regression uses **Ordinary Least Squares (OLS)** as its estimation method. OLS finds the parameter values that **minimize the sum of squared residuals** — the squared vertical distances between each observed data point and the predicted value on the regression line.
+
+**Why "Least Squares"?** The method minimizes the sum of squared errors rather than absolute errors. Squaring has two advantages: it makes all errors positive (so they don't cancel out), and it penalizes large errors more heavily, encouraging the model to avoid big mistakes.
+
+**How it works:** Given the data, OLS computes the parameters $\theta$ (intercept and coefficients) such that the total squared error between the predicted values $\hat{y}_i = X_i \theta$ and the actual values $y_i$ is as small as possible. This can be solved either analytically (Normal Equation) or iteratively (Gradient Descent) — both approaches are detailed below.
+
+
 
 ## Cost Function
 
 **Mean Squared Error (MSE):**
 
-$$J(\theta) = \frac{1}{2m} \sum_{i=1}^{m} (\hat{y}_i - y_i)^2$$
+$$\text{MSE} = \frac{1}{m} \sum_{i=1}^{m} (y_i - \hat{y}_i)^2$$
+
+MSE is the standard metric that measures the average of the squared differences between predicted and actual values.
+
+**Optimization Cost Function $J(\theta)$:**
+
+For gradient descent, we use a slightly modified version with a $\frac{1}{2}$ factor:
+
+$$J(\theta) = \frac{1}{2m} \sum_{i=1}^{m} (y_i - \hat{y}_i)^2$$
 
 Or in matrix form:
 
-$$J(\theta) = \frac{1}{2m} (X\theta - y)^T (X\theta - y)$$
+$$J(\theta) = \frac{1}{2m} (y - X\theta)^T (y - X\theta)$$
 
-The cost function measures how wrong our predictions are. It computes the average of the squared differences between predicted values and actual values. The factor of 2 in the denominator is a convenience that simplifies the derivative during optimization.
+The $\frac{1}{2}$ is a mathematical convenience — when we take the derivative of $J(\theta)$ during gradient descent, the exponent 2 from the square cancels with the $\frac{1}{2}$, producing a cleaner gradient formula. **It does not change the location of the minimum** (multiplying a function by a constant doesn't move its minimum), so the optimal $\theta$ is the same whether we minimize MSE or $J(\theta)$.
 
-![Convex Cost Function](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Error_surface_of_a_linear_neuron_with_two_input_weights.png/400px-Error_surface_of_a_linear_neuron_with_two_input_weights.png)
+![Convex Cost Function](images/02_convex_cost_function.png)
 
 *The MSE cost function for linear regression is CONVEX (bowl-shaped). It has exactly ONE global minimum — no local minima to worry about.*
+
+## Key Assumptions
+
+Linear regression relies on four critical assumptions. If these assumptions are violated, the model's parameter estimates, predictions, or statistical tests (p-values, confidence intervals) may be unreliable.
+
+---
+
+### 1. Linearity
+
+**What it means:** The relationship between the independent variables $X$ and the dependent variable $y$ is linear — the expected value of $y$ changes at a constant rate as each feature $x_j$ changes, holding all other features constant.
+
+**Why it matters:** The entire linear regression model is built on the equation $y = X\theta + \varepsilon$. If the true relationship is curved, quadratic, or otherwise non-linear, a straight line will systematically miss the pattern. The model will underfit and the residuals will show clear structure instead of being random.
+
+**How to detect violations:**
+- Plot residuals vs. predicted values — if you see a curve or U-shape instead of a random scatter, the linearity assumption is violated.
+- Plot each feature against the target to visually inspect the relationship.
+
+**What to do if violated:**
+- Add polynomial features ($x^2, x^3$) — see the Polynomial Regression section.
+- Apply non-linear transformations to features (e.g., $\log(x)$, $\sqrt{x}$).
+- Use a non-linear model instead (decision trees, neural networks).
+
+---
+
+### 2. Independence
+
+**What it means:** The observations (data points) are independent of each other — the value of one observation does not influence or predict the value of another. In particular, the residual (error) of one observation should not be correlated with the residual of another.
+
+**Why it matters:** If observations are correlated (e.g., time series data where today's value depends on yesterday's), the model underestimates the true variance of the coefficients. This makes standard errors too small, p-values too low, and confidence intervals too narrow — you think your results are more significant than they actually are.
+
+**How to detect violations:**
+- **Durbin-Watson test** — tests for autocorrelation in residuals. Values near 2 indicate no autocorrelation; values near 0 or 4 indicate positive or negative autocorrelation.
+- Plot residuals in order — if you see patterns (waves, trends), the observations are not independent.
+
+**What to do if violated:**
+- Use time series models (ARIMA, exponential smoothing) instead.
+- Add lagged variables as features.
+- Use Generalized Least Squares (GLS) which accounts for correlated errors.
+
+---
+
+### 3. Homoscedasticity (Constant Variance)
+
+**What it means:** The variance of the residuals (errors) is **constant** across all levels of the predicted values. In other words, the spread of the errors doesn't change — the model is equally uncertain about its predictions whether the target value is small or large.
+
+The opposite — **heteroscedasticity** — means the error variance changes. A common example: predicting income, where prediction errors are small for low incomes but very large for high incomes.
+
+**Why it matters:** OLS assumes equal variance to give equal weight to all observations. If variance is larger for some observations, those high-variance points disproportionately influence the model. The coefficient estimates remain unbiased, but:
+- Standard errors are wrong → hypothesis tests and confidence intervals are unreliable.
+- The model is not efficient (not the best possible estimator).
+
+**How to detect violations:**
+- **Residuals vs. fitted values plot** — if the residuals fan out (funnel shape) or form a pattern, variance is not constant.
+- **Breusch-Pagan test** or **White's test** — formal statistical tests for heteroscedasticity.
+
+**What to do if violated:**
+- Apply a transformation to the target variable (e.g., $\log(y)$, $\sqrt{y}$) to stabilize variance.
+- Use **Weighted Least Squares (WLS)** — gives less weight to observations with higher variance.
+- Use **robust standard errors** (heteroscedasticity-consistent standard errors) which give correct p-values even with non-constant variance.
+
+---
+
+### 4. Normality of Residuals
+
+**What it means:** The residuals $\varepsilon_i = y_i - \hat{y}_i$ follow a **normal (Gaussian) distribution** with mean zero and constant variance: $\varepsilon \sim \mathcal{N}(0, \sigma^2)$.
+
+**Why it matters:** The normality assumption is needed for **statistical inference** — specifically for p-values, t-tests on coefficients, and confidence intervals to be valid. It does **not** affect the OLS estimates themselves (OLS finds the best linear fit regardless of residual distribution), but without normality:
+- You cannot trust whether a coefficient is statistically significant.
+- Confidence intervals may be too wide or too narrow.
+- Prediction intervals will be inaccurate.
+
+**Important nuance:** For large samples ($m > 30$), the **Central Limit Theorem** makes the coefficient estimates approximately normal even if the residuals are not. So normality is most critical for small sample sizes.
+
+**How to detect violations:**
+- **Q-Q plot** (quantile-quantile plot) — residuals should fall approximately on a straight line.
+- **Shapiro-Wilk test** or **Kolmogorov-Smirnov test** — formal tests for normality.
+- **Histogram of residuals** — should look roughly bell-shaped.
+
+**What to do if violated:**
+- Transform the target variable ($\log(y)$, Box-Cox transformation).
+- Remove outliers that distort the distribution.
+- For large samples, this assumption is less critical due to the Central Limit Theorem.
+- Use non-parametric methods or bootstrapping for inference.
+
+---
+
+### Assumptions Summary
+
+| Assumption | What It Affects If Violated | Severity |
+|:---|:---|:---|
+| **Linearity** | Biased predictions, systematic errors | High — model is fundamentally wrong |
+| **Independence** | Standard errors, p-values, confidence intervals | High — conclusions are invalid |
+| **Homoscedasticity** | Standard errors, efficiency of estimates | Medium — estimates are OK, but inference is off |
+| **Normality** | p-values, confidence intervals, prediction intervals | Low for large samples (CLT helps) |
 
 ---
 
@@ -54,9 +164,34 @@ The cost function measures how wrong our predictions are. It computes the averag
 
 ### 1. Normal Equation (Closed-Form Solution)
 
+The Normal Equation is a **direct analytical formula** that computes the optimal parameters $\theta$ in one step by setting the derivative of the cost function $J(\theta)$ to zero and solving for $\theta$ algebraically.
+
+**Time Complexity:** $O(n^3 + mn^2)$ — computing $X^TX$ costs $O(mn^2)$ and inverting it costs $O(n^3)$. **Space:** $O(mn + n^2)$.
+
+**Derivation intuition:**
+
+We want to find $\theta$ that minimizes $J(\theta) = \frac{1}{2m}(X\theta - y)^T(X\theta - y)$. Taking the gradient and setting it to zero:
+
+$$\nabla_\theta J(\theta) = \frac{1}{m} X^T(X\theta - y) = 0$$
+
+Solving for $\theta$:
+
+$$X^T X\theta = X^T y$$
+
+$$\theta = (X^T X)^{-1} X^T y$$
+
+This is called the "Normal Equation" because it comes from setting the gradient **normal** (perpendicular) to the error — the residual vector $(X\theta - y)$ is orthogonal to the column space of $X$ at the optimal solution.
+
 **Formula:**
 
 $$\theta = (X^T X)^{-1} X^T y$$
+
+Where:
+- $X$ = feature matrix $(m \times n)$ with intercept column of ones
+- $X^T$ = transpose of $X$
+- $(X^T X)^{-1}$ = inverse of the $n \times n$ matrix $X^T X$
+- $y$ = target vector $(m \times 1)$
+- $\theta$ = resulting parameter vector $(n \times 1)$
 
 **Advantages:**
 - ✅ No need to choose learning rate
@@ -93,7 +228,7 @@ Step 5: Update parameters θ := θ - α · ∇J(θ)
 Step 6: Repeat steps 2-5 until convergence
 ```
 
-![Gradient Descent Convergence](https://upload.wikimedia.org/wikipedia/commons/a/a3/Gradient_descent.gif)
+![Gradient Descent Convergence](images/03_gradient_descent_convergence.gif)
 
 *Gradient descent with different initial conditions, iteratively stepping toward the minimum. Each step moves $\theta$ in the direction of steepest descent, with step size controlled by the learning rate ($\alpha$) and the gradient magnitude.*
 
@@ -103,7 +238,7 @@ $$\theta_j := \theta_j - \alpha \frac{\partial J(\theta)}{\partial \theta_j}$$
 
 #### Gradient
 
-$$\frac{\partial J(\theta)}{\partial \theta_j} = \frac{1}{m} \sum_{i=1}^{m} (\hat{y}_i - y_i) \, x_{ij}$$
+$$\frac{\partial J(\theta)}{\partial \theta_j} = \frac{1}{m} \sum_{i=1}^{m} (\hat{y}_i - y_i) \, x_{ij}$$$$
 
 #### Vectorized Update
 
@@ -111,9 +246,9 @@ $$\theta := \theta - \frac{\alpha}{m} X^T (X\theta - y)$$
 
 #### The Learning Rate ($\alpha$)
 
-The learning rate controls the size of each step. Choosing it correctly is critical.
+The learning rate $\alpha$ is a **hyperparameter** — a value that is set before training begins and is not learned from the data. It controls the size of each step during gradient descent. Choosing it correctly is critical.
 
-![Learning Rate Effects](https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Gradient_descent.svg/400px-Gradient_descent.svg.png)
+![Learning Rate Effects](images/04_learning_rate_effects.png)
 
 | Learning Rate | Effect |
 |:---:|:---:|
@@ -266,38 +401,173 @@ Update:      θ₀ = 0.367 - 0.1·(-1.633)  = 0.530
 
 #### Types of Gradient Descent
 
-| Type | Samples per Update | Speed | Stability | Memory | Best For |
-|------|--------------------|-------|-----------|--------|----------|
-| **Batch GD** | All m samples | Slow per epoch | Smooth, stable | High | Small datasets |
-| **Stochastic GD** | 1 random sample | Fast per update | Noisy, zigzag | Low | Online learning |
-| **Mini-Batch GD** | Small batch (32-256) | Medium | Balanced | Medium | Most common in practice |
+---
 
-![Gradient Descent with Momentum - Convergence Paths](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Gradient_descent_with_momentum.svg/450px-Gradient_descent_with_momentum.svg.png)
+##### 1. Batch Gradient Descent (BGD)
+
+**Definition:** Batch Gradient Descent computes the gradient of the cost function using the **entire training dataset** at every single update step. It sums the errors across all $m$ samples, calculates the average gradient, and then updates the parameters once per epoch.
+
+**Time Complexity:** $O(mn)$ per iteration, $O(kmn)$ total — where $k$ = number of iterations. **Space:** $O(mn)$ (full dataset in memory).
+
+**Update rule:**
+
+$$\theta := \theta - \frac{\alpha}{m} \sum_{i=1}^{m} \nabla_\theta L(\hat{y}_i, y_i)$$
+
+**How it works:**
+1. Use all $m$ training samples to compute predictions.
+2. Calculate the error for every sample.
+3. Average all the gradients into one gradient vector.
+4. Update $\theta$ once.
+5. Repeat until convergence.
+
+**Advantages:**
+- ✅ **Stable convergence** — the gradient is exact (no noise), so the cost decreases smoothly at every step.
+- ✅ **Guaranteed to converge** to the global minimum for convex problems (with appropriate learning rate).
+- ✅ **Deterministic** — same result every run given the same initialization.
+- ✅ **Efficient vectorization** — a single matrix multiplication computes the gradient for all samples at once.
+
+**Disadvantages:**
+- ❌ **Slow for large datasets** — each update requires processing all $m$ samples. If $m = 10$ million, every single step is expensive.
+- ❌ **High memory usage** — the entire dataset must fit in memory to compute the gradient.
+- ❌ **Cannot learn online** — cannot incorporate new data without retraining on the entire dataset.
+- ❌ **Can get stuck in saddle points** (in non-convex problems) because the gradient is too smooth to escape.
+
+**When to use:** Small to medium datasets (up to ~10,000 samples) where stability is more important than speed.
+
+---
+
+##### 2. Stochastic Gradient Descent (SGD)
+
+**Definition:** Stochastic Gradient Descent updates the parameters after computing the gradient on **a single randomly chosen training sample**. Instead of waiting to see all the data, it makes a small update after each example.
+
+**Time Complexity:** $O(n)$ per update, $O(mn)$ per epoch, $O(kmn)$ total. **Space:** $O(n)$ (one sample at a time).
+
+**Update rule (for one random sample $i$):**
+
+$$\theta := \theta - \alpha \, \nabla_\theta L(\hat{y}_i, y_i)$$
+
+**How it works:**
+1. Shuffle the training data randomly.
+2. Pick one sample $(x_i, y_i)$.
+3. Compute the gradient using only that sample.
+4. Update $\theta$ immediately.
+5. Move to the next sample. One pass through all samples = one epoch.
+
+**Advantages:**
+- ✅ **Very fast updates** — each step is $O(n)$ instead of $O(mn)$, making it much faster per iteration.
+- ✅ **Low memory** — only one sample is needed in memory at a time.
+- ✅ **Supports online learning** — can learn from new data as it arrives without retraining from scratch.
+- ✅ **Can escape shallow local minima and saddle points** — the noise from random sampling helps the algorithm explore and avoid getting stuck (beneficial for non-convex problems like neural networks).
+
+**Disadvantages:**
+- ❌ **Noisy, unstable convergence** — the gradient from one sample is a very noisy estimate of the true gradient, causing the parameters to zigzag erratically.
+- ❌ **Never truly converges** — oscillates around the minimum instead of settling on it (unless the learning rate is decayed).
+- ❌ **Cannot exploit vectorized hardware** — processing one sample at a time doesn't benefit from GPU/matrix parallelism.
+- ❌ **Sensitive to learning rate** — too high causes divergence, too low negates the speed advantage.
+
+**When to use:** Very large datasets, online learning scenarios, or when you need to escape local minima in non-convex optimization.
+
+---
+
+##### 3. Mini-Batch Gradient Descent
+
+**Definition:** Mini-Batch Gradient Descent is the **compromise between Batch GD and SGD**. It computes the gradient on a small random subset (mini-batch) of the training data — typically 32 to 256 samples — and updates the parameters once per mini-batch.
+
+**Time Complexity:** $O(bn)$ per update, $O(mn)$ per epoch, $O(kmn)$ total — where $b$ = batch size. **Space:** $O(bn)$.
+
+**Update rule (for a mini-batch $B$ of size $b$):**
+
+$$\theta := \theta - \frac{\alpha}{b} \sum_{i \in B} \nabla_\theta L(\hat{y}_i, y_i)$$
+
+**How it works:**
+1. Shuffle the training data.
+2. Split it into mini-batches of size $b$ (e.g., 32, 64, 128, 256).
+3. For each mini-batch: compute gradient, update $\theta$.
+4. One pass through all mini-batches = one epoch.
+
+**Common mini-batch sizes:**
+
+| Batch size | Trade-off |
+|:---:|:---|
+| **32** | More noise, more updates per epoch, better generalization |
+| **64–128** | Good balance (most common default) |
+| **256** | Smoother gradient, fewer updates, faster per epoch on GPU |
+| **512+** | Very smooth, but may generalize worse and needs more memory |
+
+**How to choose the mini-batch size:**
+
+The batch size is a hyperparameter that affects training speed, convergence behavior, and generalization. Here is how to choose it:
+
+**1. Start with 32 or 64.** These are the most widely used defaults. Research (Bengio, 2012; Masters & Luschi, 2018) has consistently shown that smaller batch sizes (32–64) generalize better than large ones. When in doubt, use 32.
+
+**2. Use powers of 2.** Batch sizes of 32, 64, 128, 256, 512 align with GPU memory architecture. Non-power-of-2 sizes waste hardware capacity and run slower.
+
+**3. Consider your dataset size.** The batch size should be smaller than the training set, but the ratio matters:
+
+| Dataset size ($m$) | Recommended batch size |
+|:---:|:---|
+| $m < 500$ | Use full batch (Batch GD) — dataset is small enough |
+| $500 < m < 5{,}000$ | 32–64 |
+| $5{,}000 < m < 100{,}000$ | 64–256 |
+| $m > 100{,}000$ | 128–512 (limited by GPU memory) |
+
+**4. Check your GPU memory.** The practical upper limit on batch size is how much data fits in your GPU (or RAM). If you run out of memory, reduce the batch size. The formula is roughly:
+
+$$b_{\max} \approx \frac{\text{Available GPU memory}}{\text{Memory per sample} \times \text{multiplier for gradients/activations}}$$
+
+**5. Understand the trade-off between batch size and learning rate:**
+
+| Batch size | Gradient noise | Learning rate |
+|:---:|:---|:---|
+| Small (32) | High noise → acts as regularization | Use a smaller learning rate |
+| Large (512) | Low noise → more precise gradient | Can use a larger learning rate |
+
+A common rule of thumb: **when you double the batch size, multiply the learning rate by $\sqrt{2}$** (linear scaling rule). This keeps the effective noise level roughly constant.
+
+**6. Larger batches ≠ better models.** A counter-intuitive finding in deep learning research: larger batch sizes often lead to **worse** generalization. The noise from small batches helps the optimizer escape sharp, narrow minima and find flatter minima that generalize better. This is called the **generalization gap**.
+
+**Quick decision:**
+- **Default choice:** 32 or 64 — works well in almost all cases.
+- **If training is too slow:** increase to 128 or 256 (and increase learning rate proportionally).
+- **If running out of memory:** decrease batch size.
+- **If model overfits:** try a smaller batch size (more noise = implicit regularization).
+- **If loss is very noisy / unstable:** increase batch size for smoother gradients.
+
+**Advantages:**
+- ✅ **Balances speed and stability** — smoother than SGD, faster than Batch GD.
+- ✅ **Exploits vectorized hardware** — GPUs and modern CPUs are optimized for matrix operations on batches, making mini-batch much faster than processing one sample at a time.
+- ✅ **Good generalization** — the moderate noise from mini-batches acts as a form of regularization, often leading to better models than Batch GD.
+- ✅ **Scalable** — works well for datasets of any size.
+
+**Disadvantages:**
+- ❌ **Extra hyperparameter** — you need to choose the batch size $b$ in addition to the learning rate.
+- ❌ **Still oscillates** (less than SGD, more than Batch GD) — requires learning rate scheduling for precise convergence.
+- ❌ **Not deterministic** — results vary between runs due to random shuffling (unless you fix the random seed).
+
+**When to use:** **Almost always.** Mini-batch GD is the default choice in practice for most machine learning and deep learning applications.
+
+---
+
+#### Summary Comparison
+
+| Aspect | Batch GD | Stochastic GD | Mini-Batch GD |
+|:---|:---|:---|:---|
+| **Samples per update** | All $m$ | 1 | Mini-batch of $b$ (32–256) |
+| **Updates per epoch** | 1 | $m$ | $m / b$ |
+| **Gradient quality** | Exact | Very noisy | Moderately noisy |
+| **Convergence path** | Smooth, direct | Zigzag, erratic | Balanced |
+| **Speed per epoch** | Slow | Fast (but many steps) | Fast (vectorized) |
+| **Memory** | High ($O(m)$) | Low ($O(1)$) | Medium ($O(b)$) |
+| **Hardware utilization** | Good (vectorized) | Poor (scalar) | Best (optimized batch ops) |
+| **Online learning** | ❌ | ✅ | ❌ (but can adapt) |
+| **Escapes local minima** | ❌ | ✅ | Partially |
+| **Default choice?** | Small data only | Rarely used alone | **Yes — standard in practice** |
+
+![Gradient Descent with Momentum - Convergence Paths](images/05_gd_convergence_paths.svg)
 
 *Comparison of convergence paths. Batch GD follows a smooth path, SGD zigzags noisily, and Mini-Batch GD balances both.*
 
-**Advantages:**
-- ✅ Scales well to large datasets
-- ✅ Works with large number of features
-- ✅ Can be used for online learning
-- ✅ Memory efficient
-
-**Disadvantages:**
-- ❌ Requires choosing learning rate $\alpha$
-- ❌ Needs multiple iterations
-- ❌ May converge to local minimum (though linear regression has only one global minimum)
-- ❌ Requires feature scaling for faster convergence
-
-**When to Use:** Large datasets with many features (>10,000)
-
-## Key Assumptions
-
-Linear regression relies on four critical assumptions:
-
-1. **Linearity**: Relationship between X and y is linear
-2. **Independence**: Observations are independent of each other
-3. **Homoscedasticity**: Constant variance of residuals
-4. **Normality**: Residuals are normally distributed
+**When to Use Gradient Descent (general):** Large datasets with many features (>10,000)
 
 ## Polynomial Regression
 
@@ -319,7 +589,7 @@ $$\hat{y} = X_{poly} \theta$$
 
 ### Visual Intuition
 
-![Polynomial Regression Example](https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Polyreg_scheffe.svg/500px-Polyreg_scheffe.svg.png)
+![Polynomial Regression Example](images/06_polynomial_regression.png)
 
 *Polynomial regression fits a curve to data that a straight line cannot capture. Higher degrees fit more complex patterns but risk overfitting.*
 
@@ -369,7 +639,7 @@ Polynomial Regression is highly prone to overfitting because:
 1. **High-degree polynomials** can fit arbitrarily complex curves, including noise.
 2. **Coefficient magnitudes** can become very large, leading to wild oscillations between data points.
 
-![Underfitting vs Overfitting](https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Overfitted_Data.png/300px-Overfitted_Data.png)
+![Underfitting vs Overfitting](images/07_overfitting.png)
 
 *Left: Underfitting (degree too low). Right: Overfitting (degree too high). The model fits training data perfectly but generalizes poorly.*
 
@@ -576,11 +846,11 @@ $$SS_{tot} = \sum_{i=1}^{m}(y_i - \bar{y})^2 \quad \text{(total sum of squares �
 - R² = 0.0: Model is no better than predicting the mean
 - R² < 0: Model is worse than predicting the mean (very poor)
 
-![R² Values Illustration](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/R2values.svg/500px-R2values.svg.png)
+![R² Values Illustration](images/08_r2_values.png)
 
 *R² shows the proportion of variance explained. Higher R² = data points cluster tighter around the regression line.*
 
-![Coefficient of Determination](https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Coefficient_of_Determination.svg/400px-Coefficient_of_Determination.svg.png)
+![Coefficient of Determination](images/09_coefficient_of_determination.png)
 
 *The blue squares represent residuals with respect to the regression line (SSres). The red squares represent residuals with respect to the mean (SStot). R² = 1 − (blue / red).*
 
@@ -641,7 +911,7 @@ Below is a summary of each model variant, its estimation method, and cost functi
 
 **Cost Function:**
 
-$$J(\theta) = \frac{1}{2m} \sum_{i=1}^{m} (\hat{y}_i - y_i)^2$$
+$$J(\theta) = \frac{1}{2m} \sum_{i=1}^{m} (y_i - \hat{y}_i)^2$$
 
 This is pure MSE with no penalty term.
 
@@ -663,7 +933,7 @@ This is pure MSE with no penalty term.
 
 **Cost Function:**
 
-$$J(\theta) = \frac{1}{2m} \sum (\hat{y}_i - y_i)^2 + \lambda \sum_{j=1}^{n} \theta_j^2$$
+$$J(\theta) = \frac{1}{2m} \sum (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{n} \theta_j^2$$
 
 **Properties:**
 - Biased estimator (trades small bias for large variance reduction)
@@ -683,7 +953,7 @@ $$J(\theta) = \frac{1}{2m} \sum (\hat{y}_i - y_i)^2 + \lambda \sum_{j=1}^{n} \th
 
 **Cost Function:**
 
-$$J(\theta) = \frac{1}{2m} \sum (\hat{y}_i - y_i)^2 + \lambda \sum_{j=1}^{n} |\theta_j|$$
+$$J(\theta) = \frac{1}{2m} \sum (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{n} |\theta_j|$$
 
 **Properties:**
 - Biased estimator
@@ -703,7 +973,7 @@ $$J(\theta) = \frac{1}{2m} \sum (\hat{y}_i - y_i)^2 + \lambda \sum_{j=1}^{n} |\t
 
 **Cost Function:**
 
-$$J(\theta) = \frac{1}{2m} \sum (\hat{y}_i - y_i)^2 + r \cdot \lambda \sum |\theta_j| + \frac{(1-r)}{2} \cdot \lambda \sum \theta_j^2$$
+$$J(\theta) = \frac{1}{2m} \sum (y_i - \hat{y}_i)^2 + r \cdot \lambda \sum |\theta_j| + \frac{(1-r)}{2} \cdot \lambda \sum \theta_j^2$$
 
 **Properties:**
 - Biased estimator
@@ -721,7 +991,7 @@ $$J(\theta) = \frac{1}{2m} \sum (\hat{y}_i - y_i)^2 + r \cdot \lambda \sum |\the
 | **Lasso** | $\lambda\sum\|\theta_j\|$ | Coordinate Descent | ✅ | Low | Lower |
 | **Elastic Net** | $\lambda(r\sum\|\theta_j\| + (1\text{-}r)\sum\theta_j^2)$ | Coordinate Descent | ✅ | Low | Lower |
 
-![Bias-Variance Tradeoff](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Bias_and_variance_contributing_to_total_error.svg/500px-Bias_and_variance_contributing_to_total_error.svg.png)
+![Bias-Variance Tradeoff](images/10_bias_variance_tradeoff.png)
 
 *Total Error = Bias² + Variance + Irreducible Error. Regularization moves us from the overfitting zone (right) toward the sweet spot where total error is minimized. High $\lambda$ → underfitting (high bias), low $\lambda$ → overfitting (high variance).*
 
@@ -779,8 +1049,56 @@ predictions = model.predict(X_test)
 
 ## Time Complexity
 
-- **Normal Equation:** $O(n^3)$ due to matrix inversion
-- **Gradient Descent:** $O(kmn)$ where $k$ = iterations, $m$ = samples, $n$ = features
+Where: $m$ = number of training samples, $n$ = number of features, $k$ = number of iterations/epochs.
+
+### Training Algorithms
+
+| Algorithm | Time Complexity | Space Complexity | Notes |
+|:---|:---|:---|:---|
+| **Normal Equation** | $O(n^3 + mn^2)$ | $O(mn + n^2)$ | $n^3$ for matrix inversion of $X^TX$, $mn^2$ to compute $X^TX$. Becomes impractical when $n > 10{,}000$. |
+| **Batch Gradient Descent** | $O(kmn)$ | $O(mn)$ | $mn$ per iteration (full dataset), $k$ iterations. Linear in all dimensions. |
+| **Stochastic GD (SGD)** | $O(kn)$ per update, $O(kmn)$ per epoch | $O(n)$ | Each update is $O(n)$. One epoch = $m$ updates. Much faster per step than Batch GD. |
+| **Mini-Batch GD** | $O(kbn)$ per update, $O(kmn)$ per epoch | $O(bn)$ | $b$ = batch size. One epoch = $m/b$ updates. Best hardware utilization. |
+
+### Regularized Models
+
+| Algorithm | Training Complexity | Notes |
+|:---|:---|:---|
+| **Ridge (Normal Eq.)** | $O(n^3 + mn^2)$ | Same as Normal Equation — the $\lambda I$ addition is $O(n^2)$ and doesn't change the dominant term. |
+| **Ridge (GD)** | $O(kmn)$ | Same as standard GD — the L2 gradient term adds $O(n)$ per iteration, negligible. |
+| **Lasso (Coordinate Descent)** | $O(kmn)$ | $k$ = passes over all coordinates. Each coordinate update is $O(m)$. No closed-form solution. |
+| **Elastic Net (Coordinate Descent)** | $O(kmn)$ | Same as Lasso — combines L1 and L2 in each coordinate update. |
+
+### Polynomial Regression
+
+| Step | Complexity | Notes |
+|:---|:---|:---|
+| **Feature expansion** | $O(m \cdot \binom{n+d}{d})$ | $d$ = polynomial degree. Creates all polynomial combinations. |
+| **Training (after expansion)** | Same as LR with $p$ features | Where $p = \binom{n+d}{d}$ is the expanded feature count. Can be very large. |
+
+Example: $n=100$, $d=2$ → $p = 5{,}151$ features. Normal Equation would require inverting a $5{,}151 \times 5{,}151$ matrix.
+
+### Prediction (All Linear Models)
+
+| Operation | Complexity |
+|:---|:---|
+| **Single prediction** | $O(n)$ — dot product of feature vector and parameter vector |
+| **Batch prediction** ($m$ samples) | $O(mn)$ — matrix-vector multiplication |
+
+### Feature Scaling
+
+| Method | Fit (compute stats) | Transform (apply) |
+|:---|:---|:---|
+| **Standardization** | $O(mn)$ — compute mean and std per feature | $O(mn)$ — subtract and divide per element |
+| **Min-Max** | $O(mn)$ — find min and max per feature | $O(mn)$ — subtract and divide per element |
+| **Robust Scaling** | $O(mn \log m)$ — compute median and IQR (requires sorting) | $O(mn)$ — subtract and divide per element |
+
+### Evaluation Metrics
+
+| Metric | Complexity |
+|:---|:---|
+| **MSE, RMSE, MAE** | $O(m)$ — single pass over predictions |
+| **R²** | $O(m)$ — two passes (compute mean, then sums) |
 
 ---
 
