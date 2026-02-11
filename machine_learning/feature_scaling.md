@@ -2,7 +2,7 @@
 
 Feature scaling is the process of transforming features to a similar range or distribution. It is critical for gradient descent convergence and also affects distance-based algorithms. When features are on vastly different scales (e.g., age 0–100 vs salary 20,000–200,000), the cost function contours become elongated ellipses, causing gradient descent to zigzag and converge slowly. Scaling makes contours more circular, allowing gradient descent to move directly toward the minimum.
 
-![Feature Scaling Effect on Gradient Descent](https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Gradient_ascent_%28surface%29.png/400px-Gradient_ascent_%28surface%29.png)
+![Feature Scaling Effect on Gradient Descent](images/11_feature_scaling_contours.png)
 
 *When features are on different scales, the cost surface becomes elongated and gradient descent zigzags. Scaling makes contours more circular, allowing direct convergence to the minimum.*
 
@@ -15,6 +15,10 @@ Feature scaling is the process of transforming features to a similar range or di
 $$x' = \frac{x - \mu}{\sigma}$$
 
 Where $\mu$ = mean, $\sigma$ = standard deviation. Result: mean = 0, std = 1.
+
+**Time Complexity:**
+- Fit (compute $\mu$ and $\sigma$): $O(mn)$ — one pass over all $m$ samples and $n$ features.
+- Transform: $O(mn)$ — subtract and divide per element.
 
 **When to use:**
 - Features follow a Gaussian (normal) distribution or approximately normal
@@ -50,6 +54,10 @@ $$x' = \frac{x - x_{min}}{x_{max} - x_{min}}$$
 
 Result: all values in [0, 1].
 
+**Time Complexity:**
+- Fit (find $x_{min}$ and $x_{max}$): $O(mn)$ — one pass over all samples and features.
+- Transform: $O(mn)$ — subtract and divide per element.
+
 **When to use:**
 - Features do NOT follow a Gaussian distribution
 - Algorithms that require bounded inputs (e.g., neural networks with sigmoid activations, image pixel values)
@@ -82,6 +90,10 @@ X_scaled = scaler.fit_transform(X_train)
 $$x' = \frac{x - \text{median}}{\text{IQR}}$$
 
 Where $\text{IQR} = Q_3 - Q_1$ (75th percentile − 25th percentile).
+
+**Time Complexity:**
+- Fit (compute median and IQR): $O(mn \log m)$ — requires sorting each feature column to find percentiles.
+- Transform: $O(mn)$ — subtract and divide per element.
 
 **When to use:**
 - Data contains significant outliers

@@ -4,7 +4,7 @@ Regularization is a set of techniques that prevent overfitting by adding a penal
 
 **Why regularize?** When the model has many features, it can memorize training data (overfitting). Regularization constrains the magnitude of the coefficients, forcing the model to generalize better.
 
-![Underfitting vs Good Fit vs Overfitting](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Overfitting.svg/600px-Overfitting.svg.png)
+![Underfitting vs Good Fit vs Overfitting](images/12_overfitting_underfitting.png)
 
 *Left: Underfitting (high bias, low variance) — model is too simple. Middle: Good fit — balanced. Right: Overfitting (low bias, high variance) — model is too complex and needs regularization.*
 
@@ -13,6 +13,11 @@ Regularization is a set of techniques that prevent overfitting by adding a penal
 ## 1. Ridge Regression (L2 Regularization)
 
 **Definition:** Ridge Regression adds the sum of **squared** coefficients (L2 norm) as a penalty to the cost function. This shrinks all coefficients toward zero but never sets them exactly to zero. It keeps all features in the model but reduces their individual influence.
+
+**Time Complexity:**
+- Normal Equation: $O(n^3 + mn^2)$ — same as OLS. The $\lambda I$ addition is $O(n^2)$, negligible.
+- Gradient Descent: $O(kmn)$ — same as standard GD. The L2 gradient adds $O(n)$ per iteration.
+- Prediction: $O(n)$ per sample.
 
 **Cost Function:**
 
@@ -76,6 +81,11 @@ print(f"Best alpha: {model.alpha_}")
 
 **Definition:** Lasso (Least Absolute Shrinkage and Selection Operator) adds the sum of **absolute** coefficients (L1 norm) as a penalty. Unlike Ridge, Lasso can shrink coefficients to exactly zero, effectively removing features from the model. This makes Lasso a feature selection method.
 
+**Time Complexity:**
+- Coordinate Descent: $O(kmn)$ — where $k$ = passes over all coordinates. Each coordinate update is $O(m)$.
+- No closed-form solution, so always iterative. Typically slower than Ridge (Normal Equation).
+- Prediction: $O(n)$ per sample, but effectively $O(s)$ where $s$ is the number of non-zero coefficients (sparse).
+
 **Cost Function:**
 
 $$J(\theta) = \frac{1}{2m} \sum_{i=1}^{m} (\hat{y}_i - y_i)^2 + \lambda \sum_{j=1}^{n} |\theta_j|$$
@@ -132,6 +142,11 @@ print(f"Features selected: {np.sum(model.coef_ != 0)}")
 
 **Definition:** Elastic Net combines both L1 (Lasso) and L2 (Ridge) penalties, balancing feature selection with coefficient shrinkage. A mixing parameter `r` controls the ratio between L1 and L2. It overcomes Lasso's limitation of arbitrarily selecting among correlated features.
 
+**Time Complexity:**
+- Coordinate Descent: $O(kmn)$ — same as Lasso. The combined L1+L2 update per coordinate is still $O(m)$.
+- No closed-form solution.
+- Prediction: $O(n)$ per sample (or $O(s)$ if the solution is sparse).
+
 **Cost Function:**
 
 $$J(\theta) = \frac{1}{2m} \sum (\hat{y}_i - y_i)^2 + r \cdot \lambda \sum |\theta_j| + \frac{(1-r)}{2} \cdot \lambda \sum \theta_j^2$$
@@ -187,11 +202,11 @@ print(f"Best l1_ratio: {model.l1_ratio_}")
 
 ## Regularization Visual Comparison
 
-![L1 and L2 Regularization](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Sparsityl1.png/300px-Sparsityl1.png)
+![L1 and L2 Regularization](images/13_l1_sparsity.png)
 
 *L1 (Lasso) constraint produces sparse solutions — the optimal point tends to land on an axis, zeroing out some coefficients. L2 (Ridge) constraint shrinks all coefficients but keeps them non-zero.*
 
-![Regularization Effect on Coefficients](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/L1_and_L2_balls.svg/500px-L1_and_L2_balls.svg.png)
+![Regularization Effect on Coefficients](images/14_l1_l2_balls.png)
 
 *The diamond shape (L1/Lasso) has corners on the axes, making it more likely that the optimal solution has zero-valued coefficients. The circle (L2/Ridge) has no corners, so coefficients shrink but rarely reach zero.*
 

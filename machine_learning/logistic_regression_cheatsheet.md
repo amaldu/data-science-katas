@@ -4,6 +4,10 @@
 
 Logistic Regression is a supervised learning algorithm used for **binary classification**. Despite its name, it is a **classification** algorithm, not a regression one. It predicts the probability that an input belongs to a certain class using the **sigmoid function**.
 
+**Time Complexity (Binary Logistic Regression):**
+- Training (Gradient Descent): $O(kmn)$ — where $k$ = iterations, $m$ = samples, $n$ = features. No closed-form solution.
+- Prediction: $O(n)$ per sample — one dot product plus sigmoid evaluation.
+
 ### Core Idea
 Apply a linear function, then pass it through the sigmoid to get a probability:
 ```
@@ -111,11 +115,13 @@ Logistic regression is inherently binary, but can be extended:
 - Train K separate binary classifiers (one per class)
 - Each classifier: "class k" vs "everything else"
 - Predict class with highest probability
+- **Time Complexity:** Training: $O(K \cdot kmn)$ — train $K$ separate models. Prediction: $O(Kn)$ — evaluate all $K$ classifiers.
 
 ### One-vs-One (OvO)
 - Train K(K−1)/2 classifiers (one per class pair)
 - Each classifier distinguishes between two classes
 - Predict by majority vote
+- **Time Complexity:** Training: $O(\frac{K(K-1)}{2} \cdot km'n)$ — train $K(K-1)/2$ models, each on a subset of $m' < m$ samples. Prediction: $O(\frac{K(K-1)}{2} \cdot n)$.
 
 ### Softmax Regression (Multinomial)
 - Generalizes logistic regression to K classes directly
@@ -124,6 +130,7 @@ Logistic regression is inherently binary, but can be extended:
 P(y = k) = e^(θₖᵀx) / Σⱼ₌₁ᴷ e^(θⱼᵀx)
 ```
 - Cost function: Categorical Cross-Entropy
+- **Time Complexity:** Training: $O(kmKn)$ — one gradient step is $O(mKn)$ since $\Theta$ is an $n \times K$ matrix. Prediction: $O(Kn)$ — compute $K$ scores and softmax.
 
 ## Regularization
 
@@ -218,6 +225,21 @@ probabilities = model.predict_proba(X_test)
 3. **Ignoring class imbalance** → model predicts majority class
 4. **Ignoring multicollinearity** → unstable coefficients
 5. **Choosing wrong threshold** → always evaluate multiple thresholds
+
+## Time Complexity Summary
+
+Where: $m$ = samples, $n$ = features, $K$ = number of classes, $k$ = iterations.
+
+| Algorithm | Training | Prediction (per sample) |
+|:---|:---|:---|
+| **Binary Logistic Regression (GD)** | $O(kmn)$ | $O(n)$ |
+| **One-vs-Rest (OvR)** | $O(K \cdot kmn)$ | $O(Kn)$ |
+| **One-vs-One (OvO)** | $O(\frac{K(K-1)}{2} \cdot km'n)$ | $O(\frac{K(K-1)}{2} \cdot n)$ |
+| **Softmax Regression** | $O(kmKn)$ | $O(Kn)$ |
+| **Sigmoid evaluation** | — | $O(1)$ |
+| **Softmax evaluation** | — | $O(K)$ |
+
+> For binary classification ($K=2$), all multiclass methods reduce to the same cost as standard Logistic Regression.
 
 ## Quick Reference
 
