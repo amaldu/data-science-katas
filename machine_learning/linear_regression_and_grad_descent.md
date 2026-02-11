@@ -217,6 +217,12 @@ Gradient Descent is an iterative optimization algorithm used to find the paramet
 
 Mathematically, the gradient ($\nabla J$) is a vector of partial derivatives that points in the direction of steepest **ascent**. By subtracting the gradient, we move in the direction of steepest **descent**, toward the minimum.
 
+> **Gradient descent requires feature scaling for fast convergence.** When features are on different scales, the cost contours become elongated and gradient descent zigzags instead of converging directly.
+>
+> **Always scale your features before using gradient descent.** Standardization (Z-score) is the most common choice.
+>
+> See **[feature_scaling.md](feature_scaling.md)** for the full guide on Standardization, Min-Max Normalization, and Robust Scaling — including when to use each, advantages/disadvantages, and Python code.
+
 #### How It Works Step-by-Step
 
 ```
@@ -649,6 +655,21 @@ Polynomial Regression is highly prone to overfitting because:
 - **More training data** — harder for the model to memorize.
 - **Feature scaling** — essential when using polynomial features because $x^d$ magnifies scale differences enormously.
 
+### When to Use Polynomial Regression Instead of Other Linear Models
+
+Polynomial Regression sits between plain Linear Regression and fully non-linear models. Choosing it over other options depends on the data, the problem, and what you need from the model.
+
+**Use Polynomial Regression when:**
+
+1. **The relationship is clearly non-linear but smooth.** If a scatter plot of feature vs. target shows a curve (parabola, S-shape, or wave), a straight line will systematically underfit. Polynomial terms can capture that curvature without leaving the linear regression framework.
+
+2. **You have few features.** Polynomial feature expansion grows combinatorially. With 2–5 original features and degree 2–3, it's manageable. With 100 features, even degree 2 produces 5,000+ features — at that point, other models are better choices.
+
+3. **You need interpretable coefficients.** The model is still $\hat{y} = \theta_0 + \theta_1 x + \theta_2 x^2 + \ldots$ — each coefficient has a clear meaning (the effect of that term on the prediction). Tree-based models and neural networks don't offer this.
+
+4. **You need to extrapolate (with caution).** Unlike tree-based models which predict a constant outside the training range, polynomial models produce a mathematical function that extends beyond the data. This can be useful in engineering or physics where you know the underlying relationship is polynomial — but dangerous otherwise, because high-degree polynomials diverge wildly.
+
+
 ### Python Implementation
 
 **Using Scikit-learn:**
@@ -719,173 +740,17 @@ theta = np.linalg.pinv(X_b.T @ X_b) @ X_b.T @ y
 
 ---
 
-## Feature Scaling
 
-> **Gradient descent requires feature scaling for fast convergence.** When features are on different scales, the cost contours become elongated and gradient descent zigzags instead of converging directly.
->
-> **Always scale your features before using gradient descent.** Standardization (Z-score) is the most common choice.
->
-> See **[feature_scaling.md](feature_scaling.md)** for the full guide on Standardization, Min-Max Normalization, and Robust Scaling — including when to use each, advantages/disadvantages, and Python code.
 
 ## Model Evaluation Metrics
 
-Evaluation metrics quantify how well the model's predictions match the actual values. Different metrics emphasize different aspects of error, so choosing the right one depends on the problem.
-
----
-
-### 1. Mean Squared Error (MSE)
-
-**Definition:** The average of the squared differences between predicted and actual values. Squaring penalizes large errors more heavily than small ones.
-
-$$\text{MSE} = \frac{1}{m} \sum_{i=1}^{m} (y_i - \hat{y}_i)^2$$
-
-**Interpretation:**
-- Units: squared units of the target variable (e.g., dollars² for price prediction)
-- Lower = better. MSE = 0 means perfect predictions.
-- A large MSE means the model makes big errors on some samples.
-
-**When to use:**
-- Optimization target for training (differentiable, convex)
-- When large errors are especially undesirable (e.g., predicting structural loads)
-
-**Advantages:**
-- ✅ Mathematically convenient (smooth, differentiable)
-- ✅ Penalizes large errors heavily → encourages predictions close to all points
-- ✅ Standard cost function for linear regression
-
-**Disadvantages:**
-- ❌ Not in the same units as the target (hard to interpret directly)
-- ❌ Very sensitive to outliers (one bad prediction dominates the metric)
-- ❌ Scale-dependent (cannot compare across different datasets)
-
----
-
-### 2. Root Mean Squared Error (RMSE)
-
-**Definition:** The square root of MSE. Brings the error back to the same units as the target variable.
-
-$$\text{RMSE} = \sqrt{\text{MSE}} = \sqrt{\frac{1}{m} \sum_{i=1}^{m} (y_i - \hat{y}_i)^2}$$
-
-**Interpretation:**
-- Units: same as target variable (e.g., dollars, degrees)
-- "On average, our predictions are off by approximately RMSE units"
-- Example: RMSE = 15,000 on house prices means average error ≈ $15,000
-
-**When to use:**
-- Most common reporting metric for regression
-- When you want an interpretable measure of average error magnitude
-- When large errors should be penalized (inherits from MSE)
-
-**Advantages:**
-- ✅ Same units as target → easily interpretable
-- ✅ Penalizes large errors (inherited from squaring)
-- ✅ Most widely used regression metric
-
-**Disadvantages:**
-- ❌ Still sensitive to outliers
-- ❌ Scale-dependent (can't compare RMSE across different targets)
-- ❌ Not directly differentiable (use MSE for optimization)
-
----
-
-### 3. Mean Absolute Error (MAE)
-
-**Definition:** The average of the absolute differences between predicted and actual values. All errors are weighted equally regardless of magnitude.
-
-$$\text{MAE} = \frac{1}{m} \sum_{i=1}^{m} |y_i - \hat{y}_i|$$
-
-**Interpretation:**
-- Units: same as target variable
-- "On average, our predictions are off by MAE units"
-- Example: MAE = 10,000 on house prices means average error = $10,000
-
-**When to use:**
-- When you want a robust measure not dominated by outliers
-- When all errors should contribute equally
-- When the cost of error is proportional (not quadratic) to the error size
-
-**Advantages:**
-- ✅ Same units as target → interpretable
-- ✅ Robust to outliers (linear penalty, not quadratic)
-- ✅ Easy to understand: "average absolute error"
-
-**Disadvantages:**
-- ❌ Not differentiable at zero (harder to optimize directly)
-- ❌ Doesn't penalize large errors as much (may not suit safety-critical applications)
-- ❌ Scale-dependent
-
-**MSE vs MAE Example:**
-```
-Predictions errors: [1, 1, 1, 10]
-
-MAE  = (1 + 1 + 1 + 10) / 4 = 3.25
-RMSE = √((1 + 1 + 1 + 100) / 4) = √25.75 ≈ 5.07
-
-→ RMSE is much larger because the outlier (10) gets squared to 100.
-  Choose MAE if that outlier shouldn't dominate the evaluation.
-  Choose RMSE if that large error is genuinely important to penalize.
-```
-
----
-
-### 4. R² Score (Coefficient of Determination)
-
-**Definition:** Measures the proportion of variance in the target variable that is explained by the model. It compares the model's predictions against the simplest baseline: always predicting the mean.
-
-$$R^2 = 1 - \frac{SS_{res}}{SS_{tot}}$$
-
-Where:
-
-$$SS_{res} = \sum_{i=1}^{m}(y_i - \hat{y}_i)^2 \quad \text{(residual sum of squares — model error)}$$
-
-$$SS_{tot} = \sum_{i=1}^{m}(y_i - \bar{y})^2 \quad \text{(total sum of squares — data variance)}$$
-
-**Interpretation:**
-- R² = 1.0: Model explains 100% of the variance (perfect fit, likely overfitting)
-- R² = 0.85: Model explains 85% of the variance (good)
-- R² = 0.0: Model is no better than predicting the mean
-- R² < 0: Model is worse than predicting the mean (very poor)
-
-![R² Values Illustration](images/08_r2_values.png)
-
-*R² shows the proportion of variance explained. Higher R² = data points cluster tighter around the regression line.*
-
-![Coefficient of Determination](images/09_coefficient_of_determination.png)
-
-*The blue squares represent residuals with respect to the regression line (SSres). The red squares represent residuals with respect to the mean (SStot). R² = 1 − (blue / red).*
-
-**When to use:**
-- Comparing models on the same dataset
-- When you need a scale-independent measure of fit quality
-- Quick summary of model explanatory power
-
-**Advantages:**
-- ✅ Scale-independent (0 to 1 range for reasonable models)
-- ✅ Intuitive: "percentage of variance explained"
-- ✅ Standard metric for regression comparison
-
-**Disadvantages:**
-- ❌ Always increases when adding more features (even irrelevant ones)
-- ❌ Doesn't indicate if the model is biased
-- ❌ Can be misleading with non-linear relationships
-- ❌ Use **Adjusted R²** for multiple regression to account for number of features
-
-**Adjusted R²:**
-
-$$R^2_{adj} = 1 - \frac{(1 - R^2)(m - 1)}{m - n - 1}$$
-
-Where $m$ = samples, $n$ = features. Penalizes adding irrelevant features.
-
----
-
-### Evaluation Metrics Summary
-
-| Metric | Units | Outlier Sensitive? | Interpretability | Best For |
-|--------|-------|-------------------|------------------|----------|
-| **MSE** | Squared | ❌ Very sensitive | Low (squared units) | Optimization / training |
-| **RMSE** | Original | ❌ Sensitive | High | Reporting, comparing models |
-| **MAE** | Original | ✅ Robust | High | Robust evaluation, outlier-heavy data |
-| **R²** | Unitless | ❌ Sensitive | High | Comparing model explanatory power |
+> Evaluation metrics quantify how well the model's predictions match the actual values. Different metrics capture different aspects of error — choosing the right one depends on the problem.
+>
+> Key regression metrics: **MSE**, **RMSE**, **MAE**, **R²**, **Adjusted R²**, **MAPE**, **MedAE**.
+>
+> See **[regression_metrics_cheatsheet.md](regression_metrics_cheatsheet.md)** for the full guide on each metric — including definitions, formulas, when to use them, how to interpret them, advantages/disadvantages, and Python code.
+>
+> For classification metrics, see **[classification_metrics_cheatsheet.md](classification_metrics_cheatsheet.md)**.
 
 ## Regularization Techniques
 
@@ -895,105 +760,6 @@ Where $m$ = samples, $n$ = features. Penalizes adding irrelevant features.
 >
 > See **[regularization_techniques.md](regularization_techniques.md)** for the full guide on each technique — including cost functions, how to apply them in Python, how to interpret results, how to choose hyperparameters, and advantages/disadvantages.
 
----
-
-## Linear Regression Models: Estimation Methods and Cost Functions
-
-Below is a summary of each model variant, its estimation method, and cost function.
-
-### 1. Ordinary Least Squares (OLS) — Standard Linear Regression
-
-**Definition:** OLS is the most basic form of linear regression. It finds the line (or hyperplane) that minimizes the sum of squared residuals between predicted and actual values. There is no penalty for coefficient size — the model is free to assign any weight to any feature.
-
-**Estimation Method:** 
-- **Normal Equation** (closed-form): $\theta = (X^T X)^{-1} X^T y$
-- **Gradient Descent** (iterative): $\theta := \theta - \frac{\alpha}{m} X^T (X\theta - y)$
-
-**Cost Function:**
-
-$$J(\theta) = \frac{1}{2m} \sum_{i=1}^{m} (y_i - \hat{y}_i)^2$$
-
-This is pure MSE with no penalty term.
-
-**Properties:**
-- Unbiased estimator (gives the true parameters on average)
-- Minimum variance among unbiased estimators (Gauss-Markov theorem)
-- Prone to overfitting when many features or multicollinearity exists
-- Baseline model — always start here
-
----
-
-### 2. Ridge Regression (L2 Regularized)
-
-**Definition:** OLS + L2 penalty. Shrinks coefficients to reduce model complexity and handle multicollinearity.
-
-**Estimation Method:**
-- **Normal Equation**: $\theta = (X^T X + \lambda I)^{-1} X^T y$
-- **Gradient Descent**: $\theta := \theta - \alpha \left[\frac{1}{m} X^T(X\theta - y) + 2\lambda\theta\right]$
-
-**Cost Function:**
-
-$$J(\theta) = \frac{1}{2m} \sum (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{n} \theta_j^2$$
-
-**Properties:**
-- Biased estimator (trades small bias for large variance reduction)
-- Always invertible ($\lambda I$ fixes singularity)
-- Keeps all features
-
----
-
-### 3. Lasso Regression (L1 Regularized)
-
-**Definition:** OLS + L1 penalty. Shrinks coefficients and can eliminate features entirely.
-
-**Estimation Method:**
-- **No closed-form solution**
-- **Coordinate Descent** (most common): Optimize one $\theta_j$ at a time, cycling through all features
-- **Subgradient Descent**: $\theta := \theta - \alpha \left[\frac{1}{m} X^T(X\theta - y) + \lambda \cdot \text{sign}(\theta)\right]$
-
-**Cost Function:**
-
-$$J(\theta) = \frac{1}{2m} \sum (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{n} |\theta_j|$$
-
-**Properties:**
-- Biased estimator
-- Performs feature selection (sparse solutions)
-- Not differentiable at $\theta_j = 0$ (requires subgradient or coordinate descent)
-
----
-
-### 4. Elastic Net (L1 + L2 Regularized)
-
-**Definition:** OLS + combined L1 and L2 penalties. Balances feature selection with coefficient stability.
-
-**Estimation Method:**
-- **No closed-form solution**
-- **Coordinate Descent** (most common)
-- **Gradient Descent** with combined L1/L2 gradients
-
-**Cost Function:**
-
-$$J(\theta) = \frac{1}{2m} \sum (y_i - \hat{y}_i)^2 + r \cdot \lambda \sum |\theta_j| + \frac{(1-r)}{2} \cdot \lambda \sum \theta_j^2$$
-
-**Properties:**
-- Biased estimator
-- Feature selection (from L1) + stability (from L2)
-- Groups correlated features together
-
----
-
-### Model Comparison Summary
-
-| Model | Penalty | Estimation | Feature Selection | Bias | Variance |
-|-------|---------|------------|-------------------|------|----------|
-| **OLS** | None | Normal Eq. / GD | ❌ | Lowest | Highest |
-| **Ridge** | $\lambda\sum\theta_j^2$ | Normal Eq. / GD | ❌ | Low | Lower |
-| **Lasso** | $\lambda\sum\|\theta_j\|$ | Coordinate Descent | ✅ | Low | Lower |
-| **Elastic Net** | $\lambda(r\sum\|\theta_j\| + (1\text{-}r)\sum\theta_j^2)$ | Coordinate Descent | ✅ | Low | Lower |
-
-![Bias-Variance Tradeoff](images/10_bias_variance_tradeoff.png)
-
-*Total Error = Bias² + Variance + Irreducible Error. Regularization moves us from the overfitting zone (right) toward the sweet spot where total error is minimized. High $\lambda$ → underfitting (high bias), low $\lambda$ → overfitting (high variance).*
 
 ---
 
@@ -1047,59 +813,3 @@ predictions = model.predict(X_test)
 | Online learning required | Gradient Descent |
 | $X^T X$ is singular | Gradient Descent or Regularization |
 
-## Time Complexity
-
-Where: $m$ = number of training samples, $n$ = number of features, $k$ = number of iterations/epochs.
-
-### Training Algorithms
-
-| Algorithm | Time Complexity | Space Complexity | Notes |
-|:---|:---|:---|:---|
-| **Normal Equation** | $O(n^3 + mn^2)$ | $O(mn + n^2)$ | $n^3$ for matrix inversion of $X^TX$, $mn^2$ to compute $X^TX$. Becomes impractical when $n > 10{,}000$. |
-| **Batch Gradient Descent** | $O(kmn)$ | $O(mn)$ | $mn$ per iteration (full dataset), $k$ iterations. Linear in all dimensions. |
-| **Stochastic GD (SGD)** | $O(kn)$ per update, $O(kmn)$ per epoch | $O(n)$ | Each update is $O(n)$. One epoch = $m$ updates. Much faster per step than Batch GD. |
-| **Mini-Batch GD** | $O(kbn)$ per update, $O(kmn)$ per epoch | $O(bn)$ | $b$ = batch size. One epoch = $m/b$ updates. Best hardware utilization. |
-
-### Regularized Models
-
-| Algorithm | Training Complexity | Notes |
-|:---|:---|:---|
-| **Ridge (Normal Eq.)** | $O(n^3 + mn^2)$ | Same as Normal Equation — the $\lambda I$ addition is $O(n^2)$ and doesn't change the dominant term. |
-| **Ridge (GD)** | $O(kmn)$ | Same as standard GD — the L2 gradient term adds $O(n)$ per iteration, negligible. |
-| **Lasso (Coordinate Descent)** | $O(kmn)$ | $k$ = passes over all coordinates. Each coordinate update is $O(m)$. No closed-form solution. |
-| **Elastic Net (Coordinate Descent)** | $O(kmn)$ | Same as Lasso — combines L1 and L2 in each coordinate update. |
-
-### Polynomial Regression
-
-| Step | Complexity | Notes |
-|:---|:---|:---|
-| **Feature expansion** | $O(m \cdot \binom{n+d}{d})$ | $d$ = polynomial degree. Creates all polynomial combinations. |
-| **Training (after expansion)** | Same as LR with $p$ features | Where $p = \binom{n+d}{d}$ is the expanded feature count. Can be very large. |
-
-Example: $n=100$, $d=2$ → $p = 5{,}151$ features. Normal Equation would require inverting a $5{,}151 \times 5{,}151$ matrix.
-
-### Prediction (All Linear Models)
-
-| Operation | Complexity |
-|:---|:---|
-| **Single prediction** | $O(n)$ — dot product of feature vector and parameter vector |
-| **Batch prediction** ($m$ samples) | $O(mn)$ — matrix-vector multiplication |
-
-### Feature Scaling
-
-| Method | Fit (compute stats) | Transform (apply) |
-|:---|:---|:---|
-| **Standardization** | $O(mn)$ — compute mean and std per feature | $O(mn)$ — subtract and divide per element |
-| **Min-Max** | $O(mn)$ — find min and max per feature | $O(mn)$ — subtract and divide per element |
-| **Robust Scaling** | $O(mn \log m)$ — compute median and IQR (requires sorting) | $O(mn)$ — subtract and divide per element |
-
-### Evaluation Metrics
-
-| Metric | Complexity |
-|:---|:---|
-| **MSE, RMSE, MAE** | $O(m)$ — single pass over predictions |
-| **R²** | $O(m)$ — two passes (compute mean, then sums) |
-
----
-
-**Remember:** Linear regression is simple yet powerful. Understanding both approaches helps you choose the right tool for the problem at hand!
