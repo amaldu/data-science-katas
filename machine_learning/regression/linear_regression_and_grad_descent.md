@@ -26,7 +26,7 @@ Where:
 
 ### Visual Intuition
 
-![Linear Regression Best Fit Line](images/01_linear_regression_best_fit.png)
+![Linear Regression Best Fit Line](../images/01_linear_regression_best_fit.png)
 
 *The goal is to find the line that minimizes the total distance between data points and the line.*
 
@@ -60,7 +60,7 @@ $$J(\theta) = \frac{1}{2m} (y - X\theta)^T (y - X\theta)$$
 
 The $\frac{1}{2}$ is a mathematical convenience — when we take the derivative of $J(\theta)$ during gradient descent, the exponent 2 from the square cancels with the $\frac{1}{2}$, producing a cleaner gradient formula. **It does not change the location of the minimum** (multiplying a function by a constant doesn't move its minimum), so the optimal $\theta$ is the same whether we minimize MSE or $J(\theta)$.
 
-![Convex Cost Function](images/02_convex_cost_function.png)
+![Convex Cost Function](../images/02_convex_cost_function.png)
 
 *The MSE cost function for linear regression is CONVEX (bowl-shaped). It has exactly ONE global minimum — no local minima to worry about.*
 
@@ -72,24 +72,33 @@ Linear regression relies on four critical assumptions. If these assumptions are 
 
 ### 1. Linearity
 
-**What it means:** The relationship between the independent variables $X$ and the dependent variable $y$ is linear — the expected value of $y$ changes at a constant rate as each feature $x_j$ changes, holding all other features constant.
+**What it means:** The relationship between the dependent variable parameters $X$ and the independent variable $y$ is linear — the expected value of $y$ changes at a constant rate as each feature $x_j$ changes, holding all other features constant.
 
 **Why it matters:** The entire linear regression model is built on the equation $y = X\theta + \varepsilon$. If the true relationship is curved, quadratic, or otherwise non-linear, a straight line will systematically miss the pattern. The model will underfit and the residuals will show clear structure instead of being random.
 
 **How to detect violations:**
-- Plot residuals vs. predicted values — if you see a curve or U-shape instead of a random scatter, the linearity assumption is violated.
-- Plot each feature against the target to visually inspect the relationship.
+- Plot predictors vs. response (especially in simple regression).
+- Examine residuals vs. fitted values — residuals should show random scatter around 0.
+- Examine residuals vs. each predictor — curvature suggests nonlinearity.
+- Use partial residual plots in multiple regression.
+- Consider domain knowledge to assess plausibility of linearity.
+
 
 **What to do if violated:**
-- Add polynomial features ($x^2, x^3$) — see the Polynomial Regression section.
-- Apply non-linear transformations to features (e.g., $\log(x)$, $\sqrt{x}$).
+- Add polynomial features ($x^2 if residuals show a U-shape, x^3$ if residuals show an S-shape) 
+- Apply non-linear transformations to features (e.g., $\log(x)$ if relationship is exponential or diminishing returns, $\sqrt{x}$ if relationship has powers).
+- Use splines (breaking the data into intervals and fitting simple polynomials in each interval)
 - Use a non-linear model instead (decision trees, neural networks).
+
+Refit the model and re-check diagnostic plots.
 
 ---
 
 ### 2. Independence
 
-**What it means:** The observations (data points) are independent of each other — the value of one observation does not influence or predict the value of another. In particular, the residual (error) of one observation should not be correlated with the residual of another.
+**What it means:** The observations (data points) are independent of each other and the residual (error) of one observation should not be correlated with the residual of another.
+
+$$\text{Cov}(\varepsilon_i, \varepsilon_j) = 0 \quad \text{for } i \neq j$$
 
 **Why it matters:** If observations are correlated (e.g., time series data where today's value depends on yesterday's), the model underestimates the true variance of the coefficients. This makes standard errors too small, p-values too low, and confidence intervals too narrow — you think your results are more significant than they actually are.
 
@@ -234,7 +243,7 @@ Step 5: Update parameters θ := θ - α · ∇J(θ)
 Step 6: Repeat steps 2-5 until convergence
 ```
 
-![Gradient Descent Convergence](images/03_gradient_descent_convergence.gif)
+![Gradient Descent Convergence](../images/03_gradient_descent_convergence.gif)
 
 *Gradient descent with different initial conditions, iteratively stepping toward the minimum. Each step moves $\theta$ in the direction of steepest descent, with step size controlled by the learning rate ($\alpha$) and the gradient magnitude.*
 
@@ -254,7 +263,7 @@ $$\theta := \theta - \frac{\alpha}{m} X^T (X\theta - y)$$
 
 The learning rate $\alpha$ is a **hyperparameter** — a value that is set before training begins and is not learned from the data. It controls the size of each step during gradient descent. Choosing it correctly is critical.
 
-![Learning Rate Effects](images/04_learning_rate_effects.png)
+![Learning Rate Effects](../images/04_learning_rate_effects.png)
 
 | Learning Rate | Effect |
 |:---:|:---:|
@@ -413,7 +422,8 @@ Update:      θ₀ = 0.367 - 0.1·(-1.633)  = 0.530
 
 **Definition:** Batch Gradient Descent computes the gradient of the cost function using the **entire training dataset** at every single update step. It sums the errors across all $m$ samples, calculates the average gradient, and then updates the parameters once per epoch.
 
-**Time Complexity:** $O(mn)$ per iteration, $O(kmn)$ total — where $k$ = number of iterations. **Space:** $O(mn)$ (full dataset in memory).
+**Time Complexity:** $O(mn)$ per iteration, $O(kmn)$ total — where $k$ = number of iterations. 
+**Space:** $O(mn)$ (full dataset in memory).
 
 **Update rule:**
 
@@ -446,7 +456,8 @@ $$\theta := \theta - \frac{\alpha}{m} \sum_{i=1}^{m} \nabla_\theta L(\hat{y}_i, 
 
 **Definition:** Stochastic Gradient Descent updates the parameters after computing the gradient on **a single randomly chosen training sample**. Instead of waiting to see all the data, it makes a small update after each example.
 
-**Time Complexity:** $O(n)$ per update, $O(mn)$ per epoch, $O(kmn)$ total. **Space:** $O(n)$ (one sample at a time).
+**Time Complexity:** $O(n)$ per update, $O(mn)$ per epoch, $O(kmn)$ total. 
+**Space:** $O(n)$ (one sample at a time).
 
 **Update rule (for one random sample $i$):**
 
@@ -569,11 +580,67 @@ A common rule of thumb: **when you double the batch size, multiply the learning 
 | **Escapes local minima** | ❌ | ✅ | Partially |
 | **Default choice?** | Small data only | Rarely used alone | **Yes — standard in practice** |
 
-![Gradient Descent with Momentum - Convergence Paths](images/05_gd_convergence_paths.svg)
+![Gradient Descent with Momentum - Convergence Paths](../images/05_gd_convergence_paths.svg)
 
 *Comparison of convergence paths. Batch GD follows a smooth path, SGD zigzags noisily, and Mini-Batch GD balances both.*
 
 **When to Use Gradient Descent (general):** Large datasets with many features (>10,000)
+
+## Python Implementation Summary
+
+**Using Normal Equation:**
+```python
+theta = np.linalg.inv(X.T @ X) @ X.T @ y
+```
+
+**Using Gradient Descent:**
+```python
+for iteration in range(num_iterations):
+    predictions = X @ theta
+    errors = predictions - y
+    gradient = (1/m) * X.T @ errors
+    theta = theta - learning_rate * gradient
+```
+
+**Using Scikit-learn:**
+```python
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+```
+
+## Quick Decision Guide
+
+### Normal Equation vs Gradient Descent
+
+| Scenario | Method | Why |
+|----------|--------|-----|
+| Small dataset (< 10k samples), few features | **Normal Equation** | Direct closed-form solution, no tuning needed |
+| Large dataset (> 10k samples) | **Gradient Descent** | Normal Equation's $O(n \cdot p^2 + p^3)$ becomes too slow |
+| Many features (> 10k) | **Gradient Descent** | Matrix inversion $O(p^3)$ is prohibitive with many features |
+| Need exact solution quickly | **Normal Equation** | No hyperparameters to tune, single computation |
+| Online / streaming data | **Stochastic GD** | Updates incrementally as new data arrives |
+| $X^T X$ is singular | **Gradient Descent** or **Regularization** | Normal Equation requires invertible $X^T X$ |
+
+### Which Gradient Descent Variant?
+
+| Scenario | Variant | Why |
+|----------|---------|-----|
+| Small dataset (fits in memory, < 10k) | **Batch GD** | Uses full dataset — stable, exact gradients, converges smoothly |
+| Medium dataset (10k–100k) | **Mini-Batch GD** | Best balance of speed and stability |
+| Large dataset (> 100k) | **Mini-Batch GD** | Full-batch is too slow per step; mini-batch exploits GPU parallelism |
+| Very large / streaming data | **Stochastic GD (SGD)** | Updates per sample — fastest per iteration, handles infinite streams |
+| Online learning (data arrives continuously) | **SGD** | Processes one sample at a time, adapts to new data immediately |
+| Need fastest convergence (fewest epochs) | **Batch GD** | Most stable gradient → most direct path to minimum |
+| Need fastest wall-clock time | **Mini-Batch GD** | GPU-optimized matrix operations on batches of 32–256 |
+| Highly non-convex loss landscape | **SGD** or **Mini-Batch GD** | Noise in gradient helps escape local minima and saddle points |
+| Need reproducible, deterministic training | **Batch GD** | Same gradient every epoch — no randomness |
+| Limited GPU memory | **SGD** or **small Mini-Batch GD** | Lower memory footprint per step |
+
+> **In practice:** Mini-Batch GD (batch size 32–256) is the most widely used variant. It combines the stability of Batch GD with the speed and regularization benefits of SGD. Pure Batch GD and pure SGD are the two extremes — Mini-Batch sits in the sweet spot.
+
+---
 
 ## Polynomial Regression
 
@@ -595,7 +662,7 @@ $$\hat{y} = X_{poly} \theta$$
 
 ### Visual Intuition
 
-![Polynomial Regression Example](images/06_polynomial_regression.png)
+![Polynomial Regression Example](../images/06_polynomial_regression.png)
 
 *Polynomial regression fits a curve to data that a straight line cannot capture. Higher degrees fit more complex patterns but risk overfitting.*
 
@@ -645,7 +712,7 @@ Polynomial Regression is highly prone to overfitting because:
 1. **High-degree polynomials** can fit arbitrarily complex curves, including noise.
 2. **Coefficient magnitudes** can become very large, leading to wild oscillations between data points.
 
-![Underfitting vs Overfitting](images/07_overfitting.png)
+![Underfitting vs Overfitting](../images/07_overfitting.png)
 
 *Left: Underfitting (degree too low). Right: Overfitting (degree too high). The model fits training data perfectly but generalizes poorly.*
 
@@ -763,7 +830,7 @@ theta = np.linalg.pinv(X_b.T @ X_b) @ X_b.T @ y
 
 ---
 
-## Common Issues and Solutions
+## Common Issues in LinReg and Solutions
 
 ### Multicollinearity
 **Problem:** Features are highly correlated  
@@ -778,38 +845,4 @@ theta = np.linalg.pinv(X_b.T @ X_b) @ X_b.T @ y
 **Problem:** Model is too simple  
 **Solution:** Add polynomial features, add more features, reduce regularization
 
-## Python Implementation Summary
-
-**Using Normal Equation:**
-```python
-theta = np.linalg.inv(X.T @ X) @ X.T @ y
-```
-
-**Using Gradient Descent:**
-```python
-for iteration in range(num_iterations):
-    predictions = X @ theta
-    errors = predictions - y
-    gradient = (1/m) * X.T @ errors
-    theta = theta - learning_rate * gradient
-```
-
-**Using Scikit-learn:**
-```python
-from sklearn.linear_model import LinearRegression
-model = LinearRegression()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-```
-
-## Quick Decision Guide
-
-| Scenario | Method |
-|----------|--------|
-| Small dataset (< 10k samples) | Normal Equation |
-| Large dataset (> 10k samples) | Gradient Descent |
-| Many features (> 10k) | Gradient Descent |
-| Need exact solution quickly | Normal Equation |
-| Online learning required | Gradient Descent |
-| $X^T X$ is singular | Gradient Descent or Regularization |
 

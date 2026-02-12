@@ -95,7 +95,7 @@ print(f"Optimal threshold (Youden's J): {best_threshold:.3f}")
 σ(z) = 1 / (1 + e⁻ᶻ)
 ```
 
-![Sigmoid Function](images/15_sigmoid_function.svg)
+![Sigmoid Function](../images/15_sigmoid_function.svg)
 
 *The sigmoid (logistic) function maps any real-valued input to the range (0, 1). At z = 0 it outputs 0.5; large positive z approaches 1; large negative z approaches 0.*
 
