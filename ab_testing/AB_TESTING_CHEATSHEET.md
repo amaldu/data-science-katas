@@ -198,14 +198,16 @@ $$
 - **Typical:** 2-4 weeks
 - **Maximum:** Avoid running longer than necessary (opportunity cost)
 
-**Effects to watch for:**
+**Temporal effects to watch for:**
 
 | Effect | Description | Mitigation |
 |--------|-------------|------------|
-| **Novelty Effect** | Users react positively to anything new, effect fades | Run test longer; segment by new vs returning users |
-| **Primacy Effect** | Users prefer what they're used to, resistance to change fades | Run test longer |
-| **Maturation Effect** | User behavior stabilizes as they get familiar | Account for learning curve |
-| **Seasonality** | Behavior varies by day/week/month/holiday | Avoid holidays; run full weeks |
+| **Novelty Effect** | Users react positively to anything new, effect fades over time | Run test longer; segment by new vs returning users |
+| **Change Aversion** | The opposite of novelty: users dislike change and initially resist, but adapt over time | Run test longer; don't kill a test too early based on initial negative reaction |
+| **Primacy Effect** | Users prefer what they're used to (first exposure bias) | Run test longer; compare early vs late behavior |
+| **Maturation Effect** | User behavior stabilizes as they become familiar with the product | Account for learning curve in test duration |
+| **Holiday / Seasonal Effect** | Behavior varies by day/week/month/holiday (e.g., Black Friday, Christmas) | Avoid holidays; run full weeks; compare same day-of-week patterns |
+| **Day-of-Week Effect** | User behavior differs on weekdays vs weekends | Always run tests in full-week increments |
 
 ### 4.7 Traffic Split
 
@@ -217,19 +219,51 @@ $$
 
 ---
 
-## Step 5 - Validity Checks (NESSI)
+## Step 5 - Validity Checks
 
-Run these checks **before analyzing results** to ensure experiment integrity:
+Run these checks **before and during analysis** to ensure experiment integrity. A flawed experiment leads to flawed decisions.
 
-| Check | Method | What it Detects |
-|-------|--------|----------------|
-| **N**ovelty Effect | Segment by new vs. returning users | Temporary behavior change |
-| **E**xternal Factors | Check for holidays, outages, competitor actions | Confounding events |
-| **S**ample Ratio Mismatch (SRM) | Chi-square goodness-of-fit test | Broken randomization |
-| **S**election Bias | A/A test or pre-experiment metric comparison | Non-random group assignment |
-| **I**nstrumentation | Monitor guardrail metrics (latency, errors) | Technical issues affecting results |
+### 5.1 Internal Validity Threats
 
-### Sample Ratio Mismatch (SRM) - Critical Check
+These threaten whether the observed effect is truly caused by the treatment.
+
+| Threat | Description | How to Detect / Mitigate |
+|--------|-------------|--------------------------|
+| **Sample Ratio Mismatch (SRM)** | Actual traffic split doesn't match intended (e.g., 52/48 instead of 50/50) | Chi-square goodness-of-fit test; if $p < 0.01$, randomization is broken - do NOT trust results |
+| **Selection Bias** | Groups are not comparable before treatment | Run A/A tests; compare pre-experiment metrics between groups |
+| **Survivorship Bias** | Only analyzing users who "survived" (completed the flow, stayed active), excluding drop-offs | Define the analysis population BEFORE seeing results; include all assigned users (intent-to-treat analysis) |
+| **Instrumentalization Effect** | The measurement itself changes user behavior (e.g., added tracking slows the page) | Monitor page load time, latency, error rates as guardrail metrics |
+| **SUTVA Violation** | Stable Unit Treatment Value Assumption: a user's outcome should only depend on their OWN treatment, not others' | Use cluster randomization for social/network products; watch for spillover between groups |
+| **Network / Spillover Effects** | Treatment users affect control users through social connections, shared resources, or marketplaces | Randomize at cluster level (geo, social graph); use switchback experiments |
+| **Novelty / Change Aversion** | Users react to the change itself (positively or negatively) rather than the actual improvement | Segment by new vs returning users; run test long enough for effects to stabilize |
+| **Carryover Effects** | Previous treatment exposure affects current behavior (in sequential experiments or crossover designs) | Use washout periods between experiments; avoid reusing users across sequential tests |
+
+### 5.2 External Validity Threats
+
+These threaten whether results generalize beyond the specific experiment.
+
+| Threat | Description | How to Detect / Mitigate |
+|--------|-------------|--------------------------|
+| **Holiday / Seasonal Effect** | Test ran during an atypical period (holidays, sales events, back-to-school) | Check calendar; compare baseline metrics to historical norms |
+| **Population Bias** | Test population doesn't represent the full user base (e.g., only mobile users, only US) | Verify experiment population matches target launch population |
+| **Hawthorne Effect** | Users change behavior because they know they're being observed | Use implicit behavioral metrics rather than self-reported ones |
+| **External Events** | Competitor launches, PR crisis, economic shifts during the test | Monitor news; check if metrics shifted across ALL groups (not just treatment) |
+
+### 5.3 Analytical Threats
+
+These threaten whether the statistical analysis itself is valid.
+
+| Threat | Description | How to Detect / Mitigate |
+|--------|-------------|--------------------------|
+| **Peeking / Optional Stopping** | Checking results repeatedly and stopping when significant inflates false positive rate to 25-30% | Pre-commit to sample size; use sequential testing methods if you must peek |
+| **Multiple Testing** | Testing many metrics or segments increases false positives: $P(\geq 1\ FP) = 1 - (1-\alpha)^k$ | Use Bonferroni, Holm, or Benjamini-Hochberg corrections; pre-register ONE primary metric |
+| **Simpson's Paradox** | Aggregate result reverses when segmented (e.g., treatment wins overall but loses in every segment) | Always do segment analysis; check for confounders in traffic distribution |
+| **HARKing** | Hypothesizing After Results are Known - finding "significant" subgroups post-hoc | Pre-register hypotheses and metrics; treat post-hoc findings as exploratory |
+| **Twyman's Law** | "Any figure that looks interesting or different is usually wrong" - surprising results deserve extra scrutiny | Verify data pipeline, check for bugs, run sanity checks before celebrating |
+| **Survivorship Bias in Analysis** | Analyzing only users who completed the funnel, ignoring those who dropped off | Use intent-to-treat: analyze ALL users assigned, regardless of completion |
+| **Bot / Non-Human Traffic** | Automated traffic skews metrics | Filter known bots; check for suspicious patterns (uniform timing, identical behavior) |
+
+### 5.4 Sample Ratio Mismatch (SRM) - Critical Check
 
 If you expected 50/50 split and got 52/48, run a chi-square test:
 
@@ -238,6 +272,28 @@ $$
 $$
 
 If $p < 0.01$, there is likely a **bug in the randomization** - do NOT trust the results.
+
+**Common causes of SRM:**
+- Caching issues (one variant served from cache more often)
+- Bot traffic (bots preferentially hitting one variant)
+- Redirects failing for one variant
+- Triggering conditions differ between variants
+- Users in one group crashing/erroring more (and thus not being logged)
+
+### 5.5 SUTVA (Stable Unit Treatment Value Assumption)
+
+SUTVA requires that each user's outcome depends **only on their own treatment assignment**, not on anyone else's. Two key conditions:
+
+1. **No interference:** User A's treatment doesn't affect User B's outcome
+2. **No hidden variations:** The treatment is the same for everyone assigned to it
+
+**When SUTVA is violated:**
+- Social networks (sharing, feeds, messaging)
+- Two-sided marketplaces (Uber, Airbnb - drivers/riders, hosts/guests affect each other)
+- Shared resources (if treatment users consume more server capacity, control users get slower experience)
+- Viral features (referral programs, collaborative tools)
+
+**Solutions:** Cluster randomization (by geo, social graph), switchback experiments (alternating treatment over time periods), or ego-network randomization.
 
 ---
 
@@ -332,40 +388,7 @@ The confidence interval tells you the **range of plausible effect sizes**. If it
 
 ### Detailed Test Comparison
 
-#### Z-test for Proportions
-- **Advantages:** Simple, fast, well-understood; works great for large samples
-- **Disadvantages:** Requires large $n$; assumes known population variance
-- **A/B use case:** Conversion rate comparison between control and treatment
-
-#### Two-Sample t-test
-- **Advantages:** Works with smaller samples; doesn't require known population variance
-- **Disadvantages:** Assumes equal variance and normality; sensitive to outliers
-- **A/B use case:** Average order value, session duration comparison
-
-#### Welch's t-test
-- **Advantages:** Robust to unequal variances; no equal variance assumption needed
-- **Disadvantages:** Still assumes normality; less power than equal-variance t-test when variances are actually equal
-- **A/B use case:** Preferred default over standard t-test in practice
-
-#### Chi-Square Test
-- **Advantages:** Handles categorical data with multiple categories; easy to compute
-- **Disadvantages:** Requires expected frequency $\geq 5$ per cell; doesn't show direction of effect
-- **A/B use case:** Comparing click distributions, purchase categories
-
-#### Fisher's Exact Test
-- **Advantages:** Exact (not approximate); works with very small samples
-- **Disadvantages:** Computationally expensive for large tables; limited to 2x2 in practice
-- **A/B use case:** Small pilot tests, rare conversion events
-
-#### Mann-Whitney U Test
-- **Advantages:** No normality assumption; robust to outliers; works with ordinal data
-- **Disadvantages:** Less powerful than t-test when normality holds; tests distributions, not just means
-- **A/B use case:** User ratings, skewed revenue data, non-normal metrics
-
-#### ANOVA / Kruskal-Wallis
-- **Advantages:** Compares 3+ groups simultaneously; controls family-wise error rate
-- **Disadvantages:** Only tells you groups differ, not which ones (need post-hoc tests like Tukey HSD)
-- **A/B use case:** Multi-variant tests (A/B/C/D)
+> For a comprehensive deep-dive into every statistical test (what it is, how it works, formulas, assumptions, Python code, and when to use each), see the dedicated **[Statistical Tests for A/B Testing](ab_testing_statistical_tests.md)** cheatsheet. It covers 17 tests including parametric, non-parametric, resampling-based (permutation, bootstrap), Bayesian, and diagnostic tests.
 
 ---
 
@@ -445,15 +468,22 @@ An **adaptive** alternative to classical A/B testing:
 
 | Pitfall | Problem | Solution |
 |---------|---------|----------|
-| **Peeking** | Checking results repeatedly inflates false positives | Use sequential testing or wait for planned end date |
-| **Small sample** | Underpowered test misses real effects | Calculate sample size before running |
-| **Too many metrics** | Multiple comparisons increase false positives | Choose one primary metric; apply corrections |
+| **Peeking** | Checking results repeatedly inflates false positives to 25-30% | Use sequential testing or wait for planned end date |
+| **Underpowered test** | Too small sample misses real effects | Calculate sample size BEFORE running; don't run tests you can't power |
+| **Too many metrics** | Multiple comparisons increase false positives | Choose ONE primary metric; apply corrections for multiple testing |
 | **Selection bias** | Non-random assignment biases results | Verify randomization with A/A tests and SRM checks |
-| **Survivorship bias** | Only analyzing users who completed an action | Define analysis population before seeing results |
+| **Survivorship bias** | Only analyzing users who completed an action ignoring drop-offs | Define analysis population before seeing results; intent-to-treat analysis |
 | **Simpson's paradox** | Aggregate trend reverses in subgroups | Segment analysis; check for confounders |
-| **Network effects** | Treatment affects control through social connections | Use cluster randomization |
-| **Interference** | Users in different groups interact | Use proper randomization units |
-| **HARKing** | Hypothesizing After Results are Known | Pre-register hypotheses and metrics |
+| **Network effects / SUTVA** | Treatment affects control through social connections or shared resources | Use cluster randomization or switchback experiments |
+| **Change aversion** | Users initially reject ANY change; killing test early misses long-term benefit | Run test long enough; segment early vs late users |
+| **Novelty effect** | Users engage with ANY change; short test overestimates true effect | Run test long enough for the "shiny new toy" effect to fade |
+| **HARKing** | Hypothesizing After Results are Known leads to false discoveries | Pre-register hypotheses and metrics |
+| **Twyman's Law** | Surprisingly large effects are usually bugs, not real improvements | Sanity-check large results; verify data pipeline |
+| **Holiday / seasonal bias** | Running test during atypical period (Black Friday, holidays) | Check calendar; compare to historical baselines |
+| **Carryover effects** | Previous experiments affect current user behavior | Use washout periods; check for residual effects |
+| **Bot traffic** | Non-human traffic inflates metrics or causes SRM | Filter known bots; check for suspicious behavioral patterns |
+| **Instrumentalization** | Measurement mechanism (tracking, logging) itself affects user experience | Monitor latency and error rates as guardrail metrics |
+| **p-hacking** | Extending tests, changing alpha, or adding segments until something is "significant" | Lock in design before running; never change alpha after seeing data |
 
 ---
 
