@@ -155,11 +155,11 @@ $$SS_{tot} = \sum_{i=1}^{m}(y_i - \bar{y})^2 \quad \text{(total sum of squares �
 - R² = 0.0: Model is no better than predicting the mean
 - R² < 0: Model is worse than predicting the mean (very poor)
 
-![R² Values Illustration](images/08_r2_values.png)
+![R² Values Illustration](../images/08_r2_values.png)
 
 *R² shows the proportion of variance explained. Higher R² = data points cluster tighter around the regression line.*
 
-![Coefficient of Determination](images/09_coefficient_of_determination.png)
+![Coefficient of Determination](../images/09_coefficient_of_determination.png)
 
 *The blue squares represent residuals with respect to the regression line (SSres). The red squares represent residuals with respect to the mean (SStot). R² = 1 − (blue / red).*
 
