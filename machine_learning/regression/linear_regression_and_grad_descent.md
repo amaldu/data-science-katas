@@ -72,25 +72,34 @@ Linear regression relies on four critical assumptions. If these assumptions are 
 
 ### 1. Linearity
 
-**What it means:** The relationship between the dependent variable parameters $X$ and the independent variable $y$ is linear — the expected value of $y$ changes at a constant rate as each feature $x_j$ changes, holding all other features constant.
+**What it means:** The relationship between the independent variables (features) $X$ and the dependent variable (target) $y$ is linear — the expected value of $y$ changes at a constant rate as each feature $x_j$ changes, holding all other features constant.
 
 **Why it matters:** The entire linear regression model is built on the equation $y = X\theta + \varepsilon$. If the true relationship is curved, quadratic, or otherwise non-linear, a straight line will systematically miss the pattern. The model will underfit and the residuals will show clear structure instead of being random.
 
 **How to detect violations:**
-- Plot predictors vs. response (especially in simple regression).
-- Examine residuals vs. fitted values — residuals should show random scatter around 0.
-- Examine residuals vs. each predictor — curvature suggests nonlinearity.
-- Use partial residual plots in multiple regression.
-- Consider domain knowledge to assess plausibility of linearity.
 
+**For Simple Linear Regression** (one feature $x$, one target $y$):
+
+1. **Scatterplot of $y$ vs. $x$** — the most direct check. If the relationship looks curved (U-shaped, exponential, logarithmic) instead of forming a straight-line pattern, linearity is violated.
+2. **Residuals vs. predictors ($x$) plot** — plot the residuals ($y - \hat{y}$) against the predictor $x$. If linearity holds, the points scatter randomly around 0. Any systematic pattern (curve, fan shape) signals a violation.
+
+**For Multiple Linear Regression** (multiple features $x_1, x_2, \ldots, x_p$):
+
+1. **Residuals vs. fitted values plot** — plot the residuals ($y - \hat{y}$) against the predicted values ($\hat{y}$). If linearity holds, the points should scatter randomly around 0 with no visible pattern. A curved pattern (e.g., residuals are positive at low and high fitted values, negative in the middle) indicates non-linearity.
+2. **Residuals vs. predictors ($x$) plot** — plot residuals against each individual predictor $x_j$ separately. Curvature in any of these plots reveals *which specific predictor* has a non-linear relationship with $y$.
+3. **Partial residual plots** (also called Component + Residual plots) — these isolate the effect of each predictor after removing the influence of all other predictors, making it easier to see the true functional form of each individual relationship. More reliable than simple residual-vs-predictor plots when predictors are correlated.
+
+**For both types:**
+
+- **Domain knowledge** — consider whether a linear relationship is plausible given the context (e.g., diminishing returns on advertising spend suggests a log or square-root relationship, not linear).
 
 **What to do if violated:**
-- Add polynomial features ($x^2 if residuals show a U-shape, x^3$ if residuals show an S-shape) 
-- Apply non-linear transformations to features (e.g., $\log(x)$ if relationship is exponential or diminishing returns, $\sqrt{x}$ if relationship has powers).
-- Use splines (breaking the data into intervals and fitting simple polynomials in each interval)
-- Use a non-linear model instead (decision trees, neural networks).
+- **Add polynomial features** — add $x^2$ if residuals show a U-shape, $x^3$ if residuals show an S-shape. Keep degree $\leq 3$ or $4$ to avoid overfitting and erratic behavior at the boundaries.
+- **Apply non-linear transformations** — use $\log(x)$ if the relationship shows diminishing returns or exponential growth, $\sqrt{x}$ for power-type relationships.
+- **Use regression splines** — divide the predictor range into regions at "knots" and fit low-degree polynomials in each region, constrained to join smoothly. This provides flexibility without the instability of high-degree polynomials.
+- **Switch to a non-linear model** — if transformations are insufficient, consider decision trees, random forests, or neural networks.
 
-Refit the model and re-check diagnostic plots.
+After applying any remedy, refit the model and re-check the diagnostic plots to confirm the fix.
 
 ---
 
