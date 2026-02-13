@@ -50,6 +50,8 @@ plt.show()
 
 **Each node in the visualization shows:**
 
+![Decision Tree Structure — Iris Dataset](../images/24_decision_tree_iris_structure.svg)
+
 | Attribute | Meaning |
 |-----------|---------|
 | **Feature & threshold** | The splitting rule (e.g., `petal length <= 2.45`) |
@@ -86,6 +88,8 @@ Root: petal length <= 2.45?
 ```
 
 **Key property: Decision Trees are white-box models.** You can fully understand and explain every prediction by following the path from root to leaf. This makes them one of the most **interpretable** models in machine learning.
+
+![Decision Surface of Decision Trees on Iris Dataset](../images/23_decision_tree_iris_boundaries.png)
 
 **Prediction complexity:** $O(\log_2(m))$ for a balanced tree, where $m$ is the number of training instances. The prediction is independent of the number of features at each node — only one feature is checked per node.
 
@@ -410,6 +414,8 @@ tree_reg_mae = DecisionTreeRegressor(criterion='absolute_error', max_depth=5)
 ### Regression Tree Predictions Are Step Functions
 
 A critical property of regression trees: the predictions are **piecewise constant** — the model outputs the same value for all instances in a given region. The prediction surface looks like a **staircase**, not a smooth curve.
+
+![Decision Tree Regression — Piecewise Constant Predictions](../images/26_decision_tree_regression.png)
 
 This means:
 - Regression trees **cannot extrapolate** — predictions outside the training range are clamped to the nearest leaf value
