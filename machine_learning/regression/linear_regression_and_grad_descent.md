@@ -455,7 +455,7 @@ $$\theta := \theta - \frac{\alpha}{m} \sum_{i=1}^{m} \nabla_\theta L(\hat{y}_i, 
 - ❌ **Slow for large datasets** — each update requires processing all $m$ samples. If $m = 10$ million, every single step is expensive.
 - ❌ **High memory usage** — the entire dataset must fit in memory to compute the gradient.
 - ❌ **Cannot learn online** — cannot incorporate new data without retraining on the entire dataset.
-- ❌ **Can get stuck in saddle points** (in non-convex problems) because the gradient is too smooth to escape.
+- ❌ **Can get stuck in saddle points and local minima** (in non-convex problems) because the gradient is too smooth to escape.
 
 **When to use:** Small to medium datasets (up to ~10,000 samples) where stability is more important than speed.
 
@@ -651,207 +651,250 @@ predictions = model.predict(X_test)
 
 ---
 
-## Polynomial Regression
-
-### What is Polynomial Regression?
-
-Polynomial Regression is an extension of Linear Regression that models **non-linear relationships** between features and the target variable by adding polynomial terms (powers and interactions of the original features) to the model.
-
-Despite fitting curves, Polynomial Regression is still a **linear model** — it is linear in the **parameters** $\theta$, not in the features $x$. We simply create new features ($x^2, x^3, \ldots$) and then fit a standard linear model on the expanded feature set.
-
-### Equation
-
-For a single feature $x$, polynomial regression of degree $d$:
-
-$$\hat{y} = \theta_0 + \theta_1 x + \theta_2 x^2 + \theta_3 x^3 + \cdots + \theta_d x^d$$
-
-In matrix form, we transform the feature matrix $X$ into a polynomial feature matrix $X_{poly}$ and then apply regular linear regression:
-
-$$\hat{y} = X_{poly} \theta$$
-
-### Visual Intuition
-
-![Polynomial Regression Example](../images/06_polynomial_regression.png)
-
-*Polynomial regression fits a curve to data that a straight line cannot capture. Higher degrees fit more complex patterns but risk overfitting.*
-
-### How It Works
-
-```
-Step 1: Choose a polynomial degree d
-Step 2: Transform features: [x] → [x, x², x³, ..., xᵈ]
-Step 3: (Optional) Add interaction terms for multiple features
-Step 4: Fit standard Linear Regression on the transformed features
-Step 5: Use Normal Equation or Gradient Descent to find θ
-```
-
-**For multiple features** ($x_1, x_2$) with degree 2, the expanded features include:
-
-$$[1, \; x_1, \; x_2, \; x_1^2, \; x_1 x_2, \; x_2^2]$$
-
-The number of features grows combinatorially: with $n$ original features and degree $d$, the expanded feature count is $\binom{n+d}{d}$. For example:
-
-| Original features ($n$) | Degree ($d$) | Polynomial features |
-|:---:|:---:|:---:|
-| 2 | 2 | 6 |
-| 2 | 3 | 10 |
-| 10 | 2 | 66 |
-| 10 | 3 | 286 |
-| 100 | 2 | 5,151 |
-
-### Choosing the Polynomial Degree
-
-The degree $d$ is a **hyperparameter** that controls the model's complexity:
-
-| Degree | Model behavior | Risk |
-|:---:|:---|:---|
-| **1** | Standard linear regression (straight line) | Underfitting if relationship is non-linear |
-| **2–3** | Captures moderate curvature | Usually a good default |
-| **4–6** | Fits complex shapes | Starting to overfit on small datasets |
-| **> 6** | Extreme flexibility | Almost certainly overfitting |
-
-**How to choose:**
-- Use **cross-validation** to compare different degrees and pick the one with the lowest validation error.
-- Watch the **learning curves**: if training error is low but validation error is high, the degree is too high.
-- **Start simple** (degree 2) and increase only if the model underfits.
-
-### Overfitting and Regularization
-
-Polynomial Regression is highly prone to overfitting because:
-1. **High-degree polynomials** can fit arbitrarily complex curves, including noise.
-2. **Coefficient magnitudes** can become very large, leading to wild oscillations between data points.
-
-![Underfitting vs Overfitting](../images/07_overfitting.png)
-
-*Left: Underfitting (degree too low). Right: Overfitting (degree too high). The model fits training data perfectly but generalizes poorly.*
-
-**Solutions:**
-- **Regularization** (Ridge, Lasso, Elastic Net) — constrains coefficient magnitudes. See [regularization_techniques.md](regularization_techniques.md).
-- **Reduce degree** — simplest fix.
-- **More training data** — harder for the model to memorize.
-- **Feature scaling** — essential when using polynomial features because $x^d$ magnifies scale differences enormously.
-
-### When to Use Polynomial Regression Instead of Other Linear Models
-
-Polynomial Regression sits between plain Linear Regression and fully non-linear models. Choosing it over other options depends on the data, the problem, and what you need from the model.
-
-**Use Polynomial Regression when:**
-
-1. **The relationship is clearly non-linear but smooth.** If a scatter plot of feature vs. target shows a curve (parabola, S-shape, or wave), a straight line will systematically underfit. Polynomial terms can capture that curvature without leaving the linear regression framework.
-
-2. **You have few features.** Polynomial feature expansion grows combinatorially. With 2–5 original features and degree 2–3, it's manageable. With 100 features, even degree 2 produces 5,000+ features — at that point, other models are better choices.
-
-3. **You need interpretable coefficients.** The model is still $\hat{y} = \theta_0 + \theta_1 x + \theta_2 x^2 + \ldots$ — each coefficient has a clear meaning (the effect of that term on the prediction). Tree-based models and neural networks don't offer this.
-
-4. **You need to extrapolate (with caution).** Unlike tree-based models which predict a constant outside the training range, polynomial models produce a mathematical function that extends beyond the data. This can be useful in engineering or physics where you know the underlying relationship is polynomial — but dangerous otherwise, because high-degree polynomials diverge wildly.
-
-
-### Python Implementation
-
-**Using Scikit-learn:**
-
-```python
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-
-# Create a pipeline: polynomial features → scaling → linear regression
-poly_model = Pipeline([
-    ('poly_features', PolynomialFeatures(degree=3, include_bias=False)),
-    ('scaler', StandardScaler()),
-    ('lin_reg', LinearRegression())
-])
-
-poly_model.fit(X_train, y_train)
-predictions = poly_model.predict(X_test)
-```
-
-**With regularization (recommended):**
-
-```python
-from sklearn.linear_model import Ridge
-
-poly_ridge = Pipeline([
-    ('poly_features', PolynomialFeatures(degree=3, include_bias=False)),
-    ('scaler', StandardScaler()),
-    ('ridge', Ridge(alpha=1.0))
-])
-
-poly_ridge.fit(X_train, y_train)
-```
-
-**From scratch with NumPy:**
-
-```python
-import numpy as np
-
-# Generate polynomial features for a single feature
-def polynomial_features(X, degree):
-    """Transform X into polynomial features [X, X², X³, ..., Xᵈ]."""
-    X_poly = np.column_stack([X ** d for d in range(1, degree + 1)])
-    return X_poly
-
-# Example
-X = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
-X_poly = polynomial_features(X, degree=3)
-# X_poly = [[1, 1, 1], [2, 4, 8], [3, 9, 27], [4, 16, 64], [5, 25, 125]]
-
-# Add intercept and fit using Normal Equation
-X_b = np.c_[np.ones(X_poly.shape[0]), X_poly]
-theta = np.linalg.pinv(X_b.T @ X_b) @ X_b.T @ y
-```
-
-### Key Takeaways
-
-| Aspect | Detail |
-|:---|:---|
-| **What it does** | Adds polynomial terms to model non-linear relationships |
-| **Still linear?** | Yes — linear in parameters, not in features |
-| **Main hyperparameter** | Polynomial degree $d$ |
-| **Danger** | Overfitting increases sharply with higher degrees |
-| **Must-do** | Feature scaling (polynomial terms amplify scale differences) |
-| **Best practice** | Use with regularization (Ridge or Elastic Net) |
-| **Feature explosion** | $n=100, d=2$ → 5,151 features — be careful with high $n$ or $d$ |
+## Common Issues in Linear Regression and Solutions
 
 ---
-
-
-
-## Model Evaluation Metrics
-
-> Evaluation metrics quantify how well the model's predictions match the actual values. Different metrics capture different aspects of error — choosing the right one depends on the problem.
->
-> Key regression metrics: **MSE**, **RMSE**, **MAE**, **R²**, **Adjusted R²**, **MAPE**, **MedAE**.
->
-> See **[regression_metrics_cheatsheet.md](regression_metrics_cheatsheet.md)** for the full guide on each metric — including definitions, formulas, when to use them, how to interpret them, advantages/disadvantages, and Python code.
->
-> For classification metrics, see **[classification_metrics_cheatsheet.md](classification_metrics_cheatsheet.md)**.
-
-## Regularization Techniques
-
-> **Regularization prevents overfitting** by adding a penalty term to the cost function that discourages large coefficients.
->
-> Three main techniques: **Ridge (L2)**, **Lasso (L1)**, and **Elastic Net (L1+L2)**.
->
-> See **[regularization_techniques.md](regularization_techniques.md)** for the full guide on each technique — including cost functions, how to apply them in Python, how to interpret results, how to choose hyperparameters, and advantages/disadvantages.
-
-
----
-
-## Common Issues in LinReg and Solutions
 
 ### Multicollinearity
-**Problem:** Features are highly correlated  
-**Detection:** Variance Inflation Factor (VIF) > 5-10  
-**Solution:** Remove correlated features, PCA, regularization
+
+**What it is:** Two or more independent variables (features) are highly correlated with each other. For example, including both "height in cm" and "height in inches" as features — they carry the same information.
+
+**Why it matters:** When features are correlated, the model cannot determine which one is truly responsible for the effect on $y$. This causes:
+- **Unstable coefficients** — small changes in the data cause coefficients to swing wildly.
+- **Inflated standard errors** — the standard error of a coefficient increases by a factor of $\sqrt{\text{VIF}}$, making p-values unreliable.
+- **Loss of interpretability** — you can't trust individual coefficient values to understand feature importance.
+
+> **Important caveat:** Multicollinearity affects coefficient interpretation and statistical inference, but it does **NOT** reduce the model's predictive accuracy. If your only goal is prediction (not understanding which features matter), multicollinearity is not a problem.
+
+**How to detect:**
+- **Variance Inflation Factor (VIF)** — the primary diagnostic tool. VIF measures how much a coefficient's variance is inflated due to correlation with other predictors:
+  - $\text{VIF} < 5$: acceptable (minimal multicollinearity)
+  - $5 \leq \text{VIF} \leq 10$: moderate (warrants attention)
+  - $\text{VIF} > 10$: severe (requires action)
+- **Correlation matrix** — check pairwise correlations between features. Correlations above $|0.8|$ are a warning sign.
+- **Unstable coefficients** — if adding or removing a feature drastically changes other coefficients, multicollinearity is likely present.
+
+```python
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+import pandas as pd
+
+# Compute VIF for each feature
+vif_data = pd.DataFrame()
+vif_data['Feature'] = X_train.columns
+vif_data['VIF'] = [variance_inflation_factor(X_train.values, i) for i in range(X_train.shape[1])]
+print(vif_data.sort_values('VIF', ascending=False))
+```
+
+**Solutions:**
+- **Remove one of the correlated features** — the simplest approach. Drop the feature with the highest VIF.
+- **Combine correlated features** — create a composite variable (e.g., average or sum of correlated features).
+- **PCA (Principal Component Analysis)** — transform correlated features into uncorrelated principal components.
+- **Regularization** — Ridge regression ($L2$) handles multicollinearity well by shrinking correlated coefficients toward each other. See [regularization_techniques.md](../regularization_techniques.md).
+
+---
 
 ### Overfitting
-**Problem:** Model fits training data too well  
-**Solution:** Regularization (Ridge/Lasso), more data, feature selection
+
+**What it is:** The model fits the training data too well — it has learned the noise and random fluctuations in the training set, not just the underlying pattern. Think of it as "memorizing the answers" instead of "learning the concept."
+
+**How to detect:**
+- **Training error is low, but test error is significantly higher** — the defining sign of overfitting.
+- **Learning curves** — plot training and validation error as a function of training set size. If there is a large gap between training error (low) and validation error (high), the model is overfitting.
+- **Too many features relative to samples** — if $p$ (number of features) is close to or exceeds $n$ (number of samples), overfitting is almost guaranteed.
+
+**Solutions:**
+- **Regularization** (Ridge / Lasso / Elastic Net) — adds a penalty term to the cost function that constrains coefficient magnitudes, preventing the model from fitting noise.
+- **More training data** — makes it harder for the model to memorize individual data points.
+- **Feature selection** — remove irrelevant or redundant features to reduce model complexity.
+- **Cross-validation** — use k-fold cross-validation to evaluate model performance and select hyperparameters.
+- **Reduce polynomial degree** — if using polynomial features, lower the degree.
+
+---
 
 ### Underfitting
-**Problem:** Model is too simple  
-**Solution:** Add polynomial features, add more features, reduce regularization
 
+**What it is:** The model is too simple to capture the underlying pattern in the data. It performs poorly on both training and test data. Think of it as trying to fit a straight line to clearly curved data.
 
+**How to detect:**
+- **Both training and test errors are high** — the model fails to learn even from the data it has seen.
+- **Residual plots show systematic patterns** — if residuals have a clear structure (curves, patterns) rather than random scatter, the model is missing something.
+
+**Solutions:**
+- **Add polynomial features** — if the relationship is non-linear, adding $x^2$, $x^3$, or interaction terms can capture the curvature. See [polynomial_regression_cheatsheet.md](polynomial_regression_cheatsheet.md).
+- **Add more features** — include additional relevant predictors that carry information about $y$.
+- **Reduce regularization** — if regularization is too strong (very small $C$ or very large $\alpha$), the model is over-constrained. Decrease the penalty.
+- **Use a more complex model** — if linear regression fundamentally cannot capture the relationship, consider decision trees, random forests, SVMs, or neural networks.
+
+---
+
+## Model Evaluation
+
+Once you've trained a linear regression model, you need to measure how well it actually performs. This section covers the key metrics, residual analysis, and cross-validation techniques.
+
+> For a comprehensive deep-dive into every metric (formulas, from-scratch code, advantages/disadvantages, and when to use each), see the dedicated **[Regression Evaluation Metrics](../metrics/regression_metrics_cheatsheet.md)** cheatsheet.
+
+---
+
+### Key Evaluation Metrics
+
+| Metric | Formula | What It Tells You |
+|--------|---------|-------------------|
+| **MSE** | $\frac{1}{m}\sum(y_i - \hat{y}_i)^2$ | Average squared error — penalizes large errors heavily. Used as the training cost function. |
+| **RMSE** | $\sqrt{\text{MSE}}$ | Same as MSE but in the original units of $y$. "On average, predictions are off by ~RMSE." |
+| **MAE** | $\frac{1}{m}\sum\|y_i - \hat{y}_i\|$ | Average absolute error — more robust to outliers than RMSE. |
+| **R² (Coefficient of Determination)** | $1 - \frac{SS_{res}}{SS_{tot}}$ | Proportion of variance explained. R² = 0.85 means the model explains 85% of the variability in $y$. |
+| **Adjusted R²** | $1 - \frac{(1-R^2)(m-1)}{m-n-1}$ | Like R² but penalizes adding irrelevant features. **Always use this when comparing models with different numbers of features.** |
+
+```python
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+import numpy as np
+
+y_pred = model.predict(X_test)
+
+mse  = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+mae  = mean_absolute_error(y_test, y_pred)
+r2   = r2_score(y_test, y_pred)
+
+# Adjusted R²
+n_features = X_test.shape[1]
+n_samples  = X_test.shape[0]
+adj_r2 = 1 - (1 - r2) * (n_samples - 1) / (n_samples - n_features - 1)
+
+print(f"RMSE: {rmse:.4f}")
+print(f"MAE:  {mae:.4f}")
+print(f"R²:   {r2:.4f}")
+print(f"Adj R²: {adj_r2:.4f}")
+```
+
+**Quick guide — which metric to pick:**
+- **Reporting results?** → RMSE (interpretable units) or MAE (robust to outliers)
+- **Comparing models with different feature counts?** → Adjusted R²
+- **Data has outliers?** → MAE or Median Absolute Error
+- **Optimizing during training?** → MSE (differentiable, convex)
+
+---
+
+### Residual Analysis
+
+Residuals are the differences between actual and predicted values: $e_i = y_i - \hat{y}_i$. Analyzing them tells you whether the model's assumptions hold and where it fails.
+
+**What to look for in a residual plot (residuals vs. predicted values):**
+
+| Pattern | What It Means | Action |
+|---------|---------------|--------|
+| **Random scatter** around zero | Assumptions are met — good model | None needed |
+| **Funnel shape** (spread increases) | Heteroscedasticity — variance is not constant | Log-transform $y$, or use Weighted Least Squares |
+| **Curved pattern** (U-shape, arch) | Non-linearity — the model is missing a pattern | Add polynomial features or interaction terms |
+| **Clusters or groups** | Subgroups in data with different behaviors | Add a categorical feature, or fit separate models |
+
+```python
+import matplotlib.pyplot as plt
+
+residuals = y_test - y_pred
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+# 1. Residuals vs Predicted
+axes[0].scatter(y_pred, residuals, alpha=0.5, edgecolors='k', linewidths=0.5)
+axes[0].axhline(y=0, color='r', linestyle='--')
+axes[0].set_xlabel('Predicted values')
+axes[0].set_ylabel('Residuals')
+axes[0].set_title('Residuals vs Predicted')
+
+# 2. Histogram of residuals (should be ~normal)
+axes[1].hist(residuals, bins=30, edgecolor='k', alpha=0.7)
+axes[1].set_xlabel('Residual value')
+axes[1].set_ylabel('Frequency')
+axes[1].set_title('Residual Distribution')
+
+# 3. Q-Q plot (points should follow the diagonal)
+from scipy import stats
+stats.probplot(residuals, plot=axes[2])
+axes[2].set_title('Q-Q Plot')
+
+plt.tight_layout()
+plt.show()
+```
+
+**The three plots above answer three questions:**
+1. **Residuals vs Predicted** — Are there patterns? (checks linearity and homoscedasticity)
+2. **Histogram** — Are residuals normally distributed? (checks normality assumption)
+3. **Q-Q Plot** — Do residuals follow a theoretical normal distribution? (more precise normality check — points should lie on the diagonal line)
+
+---
+
+### Cross-Validation
+
+A single train/test split can give misleading results depending on how the data was divided. **Cross-validation** provides a more reliable estimate of model performance by testing on multiple different splits.
+
+**K-Fold Cross-Validation** — the most common approach:
+1. Split data into $k$ equally sized folds (typically $k = 5$ or $k = 10$)
+2. For each fold: train on $k-1$ folds, evaluate on the remaining fold
+3. Average the $k$ scores to get the final performance estimate
+
+```python
+from sklearn.model_selection import cross_val_score
+from sklearn.linear_model import LinearRegression
+
+model = LinearRegression()
+
+# 5-fold cross-validation using negative MSE (sklearn convention: higher = better)
+cv_scores = cross_val_score(model, X, y, cv=5, scoring='neg_mean_squared_error')
+cv_rmse = np.sqrt(-cv_scores)
+
+print(f"RMSE per fold: {cv_rmse}")
+print(f"Mean RMSE:     {cv_rmse.mean():.4f} ± {cv_rmse.std():.4f}")
+```
+
+**Why use cross-validation?**
+- **More reliable** than a single train/test split — averages over multiple splits
+- **Uses all data** for both training and validation (every sample gets tested exactly once)
+- **Detects overfitting** — if there's a large gap between training and CV scores, the model is overfitting
+
+**When to use which $k$:**
+| Value of $k$ | Use Case |
+|--------------|----------|
+| $k = 5$ | Default — good balance between bias and variance of the estimate |
+| $k = 10$ | Slightly more reliable, but 2x slower |
+| $k = m$ (LOO-CV) | Very small datasets where every sample counts. Computationally expensive for large $m$ |
+
+---
+
+### Putting It All Together: Full Evaluation Workflow
+
+```python
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+import numpy as np
+
+# 1. Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 2. Train model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# 3. Predict
+y_pred = model.predict(X_test)
+
+# 4. Metrics
+print("=== Test Set Performance ===")
+print(f"RMSE:     {np.sqrt(mean_squared_error(y_test, y_pred)):.4f}")
+print(f"MAE:      {mean_absolute_error(y_test, y_pred):.4f}")
+print(f"R²:       {r2_score(y_test, y_pred):.4f}")
+
+# 5. Cross-validation (on full data for a more reliable estimate)
+cv_rmse = np.sqrt(-cross_val_score(model, X, y, cv=5, scoring='neg_mean_squared_error'))
+print(f"\n=== 5-Fold Cross-Validation ===")
+print(f"Mean RMSE: {cv_rmse.mean():.4f} ± {cv_rmse.std():.4f}")
+
+# 6. Check residuals visually (see residual analysis section above)
+```
+
+**Interpretation checklist:**
+- R² > 0.7 → model explains a meaningful amount of variance
+- RMSE is small relative to the range of $y$ → predictions are accurate
+- CV scores are consistent across folds (low std) → model is stable
+- Residuals show no patterns → assumptions are met
