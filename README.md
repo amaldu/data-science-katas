@@ -1,6 +1,5 @@
 # Katas exercises for Data Science
 
-## Repo with katas for several data science topics and random exercises I stored on my computer for years
 
 In order to work with the virtual environment created with Poetry and the jupyter notebooks follow the next steps:
 
