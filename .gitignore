@@ -3,3 +3,10 @@ articles/ideas/
 
 # LangGraph local vector store data
 langgraph/agents/r/
+
+# Environment and IDE
+.env
+.cursor/
+
+# Downloaded datasets
+**/data/raw/
