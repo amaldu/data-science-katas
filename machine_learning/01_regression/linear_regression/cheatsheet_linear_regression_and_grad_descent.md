@@ -115,6 +115,28 @@ $$\text{Cov}(\varepsilon_i, \varepsilon_j) = 0 \quad \text{for } i \neq j$$
 - **Durbin-Watson test** — tests for autocorrelation in residuals. Values near 2 indicate no autocorrelation; values near 0 or 4 indicate positive or negative autocorrelation.
 - Plot residuals in order — if you see patterns (waves, trends), the observations are not independent.
 
+> **Durbin-Watson Test — Explained:**
+>
+> The Durbin-Watson (DW) statistic measures whether consecutive residuals are correlated. It computes the ratio of the sum of squared differences between consecutive residuals to the sum of squared residuals:
+>
+> $$DW = \frac{\sum_{i=2}^{m}(e_i - e_{i-1})^2}{\sum_{i=1}^{m} e_i^2}$$
+>
+> The statistic ranges from 0 to 4:
+>
+> | DW value | Meaning | Action |
+> |:---|:---|:---|
+> | **~2** (1.5 – 2.5) | No autocorrelation — residuals are independent | Assumption holds, proceed |
+> | **< 1.5** (toward 0) | Positive autocorrelation — consecutive residuals tend to have the same sign (e.g., several positive in a row, then several negative) | Add lagged features, use time-series models (ARIMA), or GLS |
+> | **> 2.5** (toward 4) | Negative autocorrelation — consecutive residuals alternate signs (positive, negative, positive...) | Rare; investigate data ordering, consider GLS |
+>
+> **When to use it:** Primarily for data with a natural ordering (time series, sequential measurements). For cross-sectional data (no inherent order), independence is usually safe to assume and DW is less relevant.
+>
+> ```python
+> from statsmodels.stats.stattools import durbin_watson
+> dw = durbin_watson(residuals)
+> print(f"Durbin-Watson: {dw:.2f}")
+> ```
+
 **What to do if violated:**
 - Use time series models (ARIMA, exponential smoothing) instead.
 - Add lagged variables as features.
@@ -135,6 +157,44 @@ The opposite — **heteroscedasticity** — means the error variance changes. A 
 **How to detect violations:**
 - **Residuals vs. fitted values plot** — if the residuals fan out (funnel shape) or form a pattern, variance is not constant.
 - **Breusch-Pagan test** or **White's test** — formal statistical tests for heteroscedasticity.
+
+> **Breusch-Pagan Test — Explained:**
+>
+> The Breusch-Pagan (BP) test checks whether the variance of the residuals depends on the predictor values. It works by regressing the squared residuals ($e_i^2$) on the original predictors ($X$). If the predictors can explain the pattern in the squared residuals, variance is not constant.
+>
+> It produces two key outputs:
+>
+> | Output | How to interpret |
+> |:---|:---|
+> | **LM statistic** | Test statistic — higher values indicate stronger evidence of heteroscedasticity |
+> | **p-value** | The probability of seeing this result if homoscedasticity held |
+>
+> | p-value | Interpretation | Action |
+> |:---|:---|:---|
+> | **> 0.05** | No significant heteroscedasticity — variance is approximately constant | Assumption holds, proceed |
+> | **< 0.05** | Heteroscedasticity detected — error variance changes with predicted values | Transform y (log, sqrt), use WLS, or report robust standard errors (HC3) |
+> | **< 0.05 but plot looks OK** | Borderline — large samples can trigger significance easily | Trust the residual plot more than the p-value |
+>
+> ```python
+> from statsmodels.stats.diagnostic import het_breuschpagan
+> import statsmodels.api as sm
+>
+> X_with_const = sm.add_constant(X_train)
+> bp_test = het_breuschpagan(residuals, X_with_const)
+> labels = ['LM Statistic', 'LM p-value', 'F Statistic', 'F p-value']
+> print(dict(zip(labels, bp_test)))
+> ```
+>
+> **White's Test — Explained:**
+>
+> White's test is a more general alternative to Breusch-Pagan. While BP assumes the relationship between variance and predictors is linear, White's test also checks for non-linear patterns by including squared terms and cross-products of the predictors. Use White's test when you suspect the heteroscedasticity has a non-linear form (e.g., variance increases quadratically). For most cases, Breusch-Pagan is sufficient.
+>
+> ```python
+> from statsmodels.stats.diagnostic import het_white
+> white_test = het_white(residuals, X_with_const)
+> labels = ['LM Statistic', 'LM p-value', 'F Statistic', 'F p-value']
+> print(dict(zip(labels, white_test)))
+> ```
 
 **What to do if violated:**
 - Apply a transformation to the target variable (e.g., $\log(y)$, $\sqrt{y}$) to stabilize variance.
@@ -158,6 +218,49 @@ The opposite — **heteroscedasticity** — means the error variance changes. A 
 - **Q-Q plot** (quantile-quantile plot) — residuals should fall approximately on a straight line.
 - **Shapiro-Wilk test** or **Kolmogorov-Smirnov test** — formal tests for normality.
 - **Histogram of residuals** — should look roughly bell-shaped.
+
+> **Shapiro-Wilk Test — Explained:**
+>
+> The Shapiro-Wilk test is the most powerful normality test for small to moderate samples (n < 5,000). It compares the observed distribution of residuals to what a perfect normal distribution would look like, producing a test statistic W (0 to 1) and a p-value.
+>
+> | Output | How to interpret |
+> |:---|:---|
+> | **W statistic** | Ranges from 0 to 1. Values close to 1 mean the data closely follows a normal distribution. Values significantly below 1 indicate departure from normality |
+> | **p-value** | The probability of seeing this result if the data were truly normal |
+>
+> | p-value | Interpretation | Action |
+> |:---|:---|:---|
+> | **> 0.05** | Cannot reject normality — residuals are approximately normal | Assumption holds, proceed |
+> | **< 0.05 and n ≤ 30** | Normality violated and sample is small — inference is unreliable | Transform y (Box-Cox, log), remove outliers, or use bootstrapping |
+> | **< 0.05 and n > 30** | Normality violated but CLT applies — coefficient estimates are still approximately normal | Proceed with caution; prediction intervals will be approximate |
+>
+> **Important:** With large samples (n > ~500), the Shapiro-Wilk test becomes overly sensitive — it will reject normality even for tiny, practically irrelevant deviations. For large samples, rely on the Q-Q plot visual inspection instead.
+>
+> ```python
+> from scipy import stats
+> stat, p_value = stats.shapiro(residuals)
+> print(f"Shapiro-Wilk: W={stat:.4f}, p={p_value:.4f}")
+> ```
+>
+> **Kolmogorov-Smirnov Test — Explained:**
+>
+> The Kolmogorov-Smirnov (KS) test compares the cumulative distribution of the residuals to a theoretical normal distribution. It measures the maximum distance between the two curves. Unlike Shapiro-Wilk, it works for any sample size, but it is **less powerful** (less likely to detect non-normality when it exists).
+>
+> | p-value | Interpretation | Action |
+> |:---|:---|:---|
+> | **> 0.05** | Cannot reject normality | Assumption holds |
+> | **< 0.05** | Distribution differs significantly from normal | Same remedies as Shapiro-Wilk |
+>
+> **When to use which:**
+> - **n < 5,000** → use Shapiro-Wilk (more powerful)
+> - **n ≥ 5,000** → use KS test or rely on Q-Q plot (Shapiro-Wilk becomes too sensitive)
+> - **Always** → check the Q-Q plot visually alongside any formal test
+>
+> ```python
+> from scipy import stats
+> stat, p_value = stats.kstest(residuals, 'norm', args=(residuals.mean(), residuals.std()))
+> print(f"Kolmogorov-Smirnov: stat={stat:.4f}, p={p_value:.4f}")
+> ```
 
 **What to do if violated:**
 - Transform the target variable ($\log(y)$, Box-Cox transformation).
@@ -673,6 +776,28 @@ predictions = model.predict(X_test)
   - $\text{VIF} > 10$: severe (requires action)
 - **Correlation matrix** — check pairwise correlations between features. Correlations above $|0.8|$ are a warning sign.
 - **Unstable coefficients** — if adding or removing a feature drastically changes other coefficients, multicollinearity is likely present.
+
+> **Variance Inflation Factor (VIF) — Explained:**
+>
+> VIF quantifies how much the variance of a coefficient is inflated because of linear relationships with other predictors. For each feature $x_j$, VIF is computed by regressing $x_j$ on all other features and measuring how well they predict it:
+>
+> $$\text{VIF}_j = \frac{1}{1 - R_j^2}$$
+>
+> Where $R_j^2$ is the R-squared from regressing feature $x_j$ on all other features. If $x_j$ is perfectly predicted by other features ($R_j^2 = 1$), VIF is infinite. If $x_j$ is completely independent ($R_j^2 = 0$), VIF = 1.
+>
+> **How to interpret:**
+>
+> | VIF value | $R_j^2$ (how well other features predict this one) | Meaning | Action |
+> |:---|:---|:---|:---|
+> | **1** | 0% | No correlation with other features | No issue |
+> | **1 – 5** | 0% – 80% | Low to moderate correlation | Acceptable, no action needed |
+> | **5 – 10** | 80% – 90% | High correlation | Monitor; consider combining features or dropping one |
+> | **> 10** | > 90% | Severe multicollinearity | Must act: drop one feature from the correlated pair, use PCA, or use Ridge regression |
+> | **> 100** | > 99% | Near-perfect collinearity | Features are essentially duplicates; drop one immediately |
+>
+> **Practical effect on coefficients:** A VIF of 10 means the standard error of that coefficient is $\sqrt{10} \approx 3.2$ times larger than it would be without multicollinearity. This makes it much harder to detect whether the feature is statistically significant — the p-value inflates and confidence intervals widen.
+>
+> **Important:** VIF requires at least 2 features to be meaningful. For simple linear regression (one feature), multicollinearity does not apply.
 
 ```python
 from statsmodels.stats.outliers_influence import variance_inflation_factor

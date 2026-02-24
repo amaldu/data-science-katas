@@ -335,13 +335,13 @@ medae = np.median(np.abs(y_true - y_pred))
 
 | Metric | Formula | Units | Outlier Sensitive? | Interpretability | Best For |
 |:---|:---|:---|:---|:---|:---|
-| **MSE** | $\frac{1}{m}\sum(y_i - \hat{y}_i)^2$ | Squared | ❌ Very sensitive | Low | Optimization / training |
-| **RMSE** | $\sqrt{\text{MSE}}$ | Original | ❌ Sensitive | High | Reporting, comparing models |
-| **MAE** | $\frac{1}{m}\sum|y_i - \hat{y}_i|$ | Original | ✅ Robust | High | Robust evaluation |
-| **R²** | $1 - SS_{res}/SS_{tot}$ | Unitless | ❌ Sensitive | High | Explanatory power |
-| **Adjusted R²** | Penalized R² | Unitless | ❌ Sensitive | High | Model comparison (different # features) |
-| **MAPE** | $\frac{100}{m}\sum|{(y_i - \hat{y}_i)}/{y_i}|$ | Percentage | ❌ Sensitive | Very high | Cross-scale comparison |
-| **MedAE** | $\text{median}(|y_i - \hat{y}_i|)$ | Original | ✅ Very robust | High | Outlier-heavy data |
+| **MSE** | $\frac{1}{m}\sum_{i=1}^{m}(y_i - \hat{y}_i)^2$ | Squared | ❌ Very sensitive | Low | Optimization / training |
+| **RMSE** | $\sqrt{\frac{1}{m}\sum_{i=1}^{m}(y_i - \hat{y}_i)^2}$ | Original | ❌ Sensitive | High | Reporting, comparing models |
+| **MAE** | $\frac{1}{m}\sum_{i=1}^{m}\lvert y_i - \hat{y}_i \rvert$ | Original | ✅ Robust | High | Robust evaluation |
+| **R²** | $1 - \frac{\sum_{i=1}^{m}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{m}(y_i - \bar{y})^2}$ | Unitless | ❌ Sensitive | High | Explanatory power |
+| **Adjusted R²** | $1 - \frac{(1 - R^2)(m - 1)}{m - p - 1}$ | Unitless | ❌ Sensitive | High | Model comparison (different # features) |
+| **MAPE** | $\frac{100}{m}\sum_{i=1}^{m}\left\lvert\frac{y_i - \hat{y}_i}{y_i}\right\rvert$ | Percentage | ❌ Sensitive | Very high | Cross-scale comparison |
+| **MedAE** | $\text{median}(\lvert y_i - \hat{y}_i \rvert)$ | Original | ✅ Very robust | High | Outlier-heavy data |
 
 ---
 
