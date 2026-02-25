@@ -1,8 +1,10 @@
 # Katas exercises for Data Science
 
-If you find this project useful, consider giving it a **star** — it helps others discover it and keeps me motivated!
+If you find this project useful, consider giving it a ⭐ **star** so it helps others discover it and keeps me motivated!
 
-Contributions are welcome. **Fork** the repository, make your changes, and open a pull request.
+Contributions are welcome! 🍴 **Fork** my repository, make your changes, and open a pull request!
+
+--- 
 
 In order to work with the virtual environment created with Poetry and the jupyter notebooks follow the next steps:
 
