@@ -1,5 +1,8 @@
 # Katas exercises for Data Science
 
+If you find this project useful, consider giving it a **star** — it helps others discover it and keeps me motivated!
+
+Contributions are welcome. **Fork** the repository, make your changes, and open a pull request.
 
 In order to work with the virtual environment created with Poetry and the jupyter notebooks follow the next steps:
 
@@ -64,6 +67,4 @@ Refresh localhost postgres and you should see them:
 </p>
 
 Remember that in order to execute the cells on jupyter nobook with SQL code you have to add ```%%sql``` at the begining
-
-
 
