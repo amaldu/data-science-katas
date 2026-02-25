@@ -10,3 +10,6 @@ langgraph/agents/r/
 
 # Downloaded datasets
 **/data/raw/
+
+# Audio text-to-speech files
+**/audios/

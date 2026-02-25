@@ -85,9 +85,17 @@ Linear regression relies on four critical assumptions. If these assumptions are 
 
 **For Multiple Linear Regression** (multiple features $x_1, x_2, \ldots, x_p$):
 
-1. **Residuals vs. fitted values plot**. plot the residuals ($y - \hat{y}$) against the predicted values ($\hat{y}$). If linearity holds, the points should scatter randomly around 0 with no visible pattern. A curved pattern (e.g., residuals are positive at low and high fitted values, negative in the middle) indicates non-linearity.
-2. **Residuals vs. predictors ($x$) plot**. plot residuals against each individual predictor $x_j$ separately. Curvature in any of these plots reveals *which specific predictor* has a non-linear relationship with $y$.
-3. **Partial residual plots** (also called Component + Residual plots). these isolate the effect of each predictor after removing the influence of all other predictors, making it easier to see the true functional form of each individual relationship. More reliable than simple residual-vs-predictor plots when predictors are correlated.
+1. **Residuals vs. fitted values plot**. plot the residuals ($y - \hat{y}$) against the predicted values ($\hat{y}$).
+   - **Linearity holds:** residuals bounce randomly around the horizontal zero line forming a roughly horizontal band with no pattern.
+   - *Note:* a funnel shape (spread increases left to right) indicates heteroscedasticity, not non-linearity.
+
+2. **Residuals vs. predictors ($x$) plot**. plot residuals against each individual predictor $x_j$ separately.
+   - **Linearity holds:** random scatter around zero with no visible trend for every predictor.
+   - *Note:* for simple linear regression this gives the same information as the residuals vs. fitted plot. It becomes more valuable in multiple regression to pinpoint problematic predictors.
+
+3. **Partial residual plots** (also called Component + Residual plots). plot $\hat{\beta}_j x_j + e$ against $x_j$, where $\hat{\beta}_j x_j$ is the fitted component and $e$ are the full-model residuals. This isolates the effect of each predictor after removing the influence of all other predictors.
+   - **Linearity holds:** the scatter follows the fitted straight line ($\hat{\beta}_j x_j$) closely. A LOESS smoother overlaid on the plot should roughly coincide with the fitted line.
+   - *Limitation:* when $x_j$ is highly correlated with other predictors, the variance in the partial residual plot can appear artificially small, masking actual non-linearity. More reliable than simple residual-vs-predictor plots when predictors are moderately correlated, but less trustworthy under severe multicollinearity.
 
 **For both types:**
 
@@ -742,13 +750,43 @@ Once you've trained a linear regression model, you need to measure how well it a
 
 ### Key Evaluation Metrics
 
-| Metric | Formula | What It Tells You |
-|--------|---------|-------------------|
-| **MSE** | $\frac{1}{m}\sum(y_i - \hat{y}_i)^2$ | Average squared error. penalizes large errors heavily. Used as the training cost function. |
-| **RMSE** | $\sqrt{\text{MSE}}$ | Same as MSE but in the original units of $y$. "On average, predictions are off by ~RMSE." |
-| **MAE** | $\frac{1}{m}\sum\|y_i - \hat{y}_i\|$ | Average absolute error. more robust to outliers than RMSE. |
-| **R² (Coefficient of Determination)** | $1 - \frac{SS_{res}}{SS_{tot}}$ | Proportion of variance explained. R² = 0.85 means the model explains 85% of the variability in $y$. |
-| **Adjusted R²** | $1 - \frac{(1-R^2)(m-1)}{m-n-1}$ | Like R² but penalizes adding irrelevant features. **Always use this when comparing models with different numbers of features.** |
+**MSE (Mean Squared Error)**
+
+$$\text{MSE} = \frac{1}{m} \sum_{i=1}^{m} (y_i - \hat{y}_i)^2$$
+
+Average squared error. Penalizes large errors heavily. Used as the training cost function.
+
+---
+
+**RMSE (Root Mean Squared Error)**
+
+$$\text{RMSE} = \sqrt{\text{MSE}}$$
+
+Same as MSE but in the original units of $y$. "On average, predictions are off by ~RMSE."
+
+---
+
+**MAE (Mean Absolute Error)**
+
+$$\text{MAE} = \frac{1}{m} \sum_{i=1}^{m} \lvert y_i - \hat{y}_i \rvert$$
+
+Average absolute error. More robust to outliers than RMSE.
+
+---
+
+**R² (Coefficient of Determination)**
+
+$$R^2 = 1 - \frac{SS_{\text{res}}}{SS_{\text{tot}}}$$
+
+Proportion of variance explained. $R^2 = 0.85$ means the model explains 85% of the variability in $y$.
+
+---
+
+**Adjusted R²**
+
+$$R^2_{\text{adj}} = 1 - \frac{(1 - R^2)(m - 1)}{m - n - 1}$$
+
+Like R² but penalizes adding irrelevant features. **Always use this when comparing models with different numbers of features.**
 
 **Quick guide. which metric to pick:**
 - **Reporting results?** → RMSE (interpretable units) or MAE (robust to outliers)
