@@ -26,17 +26,17 @@ Where:
 
 ### Visual Intuition
 
-![Linear Regression Best Fit Line](../images/01_linear_regression_best_fit.png)
+![Linear Regression Best Fit Line](../../images/01_linear_regression_best_fit.png)
 
 *The goal is to find the line that minimizes the total distance between data points and the line.*
 
 ### Estimation Method
 
-Linear Regression uses **Ordinary Least Squares (OLS)** as its estimation method. OLS finds the parameter values that **minimize the sum of squared residuals** — the squared vertical distances between each observed data point and the predicted value on the regression line.
+Linear Regression uses **Ordinary Least Squares (OLS)** as its estimation method. OLS finds the parameter values that **minimize the sum of squared residuals**. the squared vertical distances between each observed data point and the predicted value on the regression line.
 
 **Why "Least Squares"?** The method minimizes the sum of squared errors rather than absolute errors. Squaring has two advantages: it makes all errors positive (so they don't cancel out), and it penalizes large errors more heavily, encouraging the model to avoid big mistakes.
 
-**How it works:** Given the data, OLS computes the parameters $\theta$ (intercept and coefficients) such that the total squared error between the predicted values $\hat{y}_i = X_i \theta$ and the actual values $y_i$ is as small as possible. This can be solved either analytically (Normal Equation) or iteratively (Gradient Descent) — both approaches are detailed below.
+**How it works:** Given the data, OLS computes the parameters $\theta$ (intercept and coefficients) such that the total squared error between the predicted values $\hat{y}_i = X_i \theta$ and the actual values $y_i$ is as small as possible. This can be solved either analytically (Normal Equation) or iteratively (Gradient Descent). both approaches are detailed below.
 
 
 
@@ -58,11 +58,11 @@ Or in matrix form:
 
 $$J(\theta) = \frac{1}{2m} (y - X\theta)^T (y - X\theta)$$
 
-The $\frac{1}{2}$ is a mathematical convenience — when we take the derivative of $J(\theta)$ during gradient descent, the exponent 2 from the square cancels with the $\frac{1}{2}$, producing a cleaner gradient formula. **It does not change the location of the minimum** (multiplying a function by a constant doesn't move its minimum), so the optimal $\theta$ is the same whether we minimize MSE or $J(\theta)$.
+The $\frac{1}{2}$ is a mathematical convenience. when we take the derivative of $J(\theta)$ during gradient descent, the exponent 2 from the square cancels with the $\frac{1}{2}$, producing a cleaner gradient formula. **It does not change the location of the minimum** (multiplying a function by a constant doesn't move its minimum), so the optimal $\theta$ is the same whether we minimize MSE or $J(\theta)$.
 
-![Convex Cost Function](../images/02_convex_cost_function.png)
+![Convex Cost Function](../../images/02_convex_cost_function.png)
 
-*The MSE cost function for linear regression is CONVEX (bowl-shaped). It has exactly ONE global minimum — no local minima to worry about.*
+*The MSE cost function for linear regression is CONVEX (bowl-shaped). It has exactly ONE global minimum. no local minima to worry about.*
 
 ## Key Assumptions
 
@@ -72,7 +72,7 @@ Linear regression relies on four critical assumptions. If these assumptions are 
 
 ### 1. Linearity
 
-**What it means:** The relationship between the independent variables (features) $X$ and the dependent variable (target) $y$ is linear — the expected value of $y$ changes at a constant rate as each feature $x_j$ changes, holding all other features constant.
+**What it means:** The relationship between the independent variables (features) $X$ and the dependent variable (target) $y$ is linear. the expected value of $y$ changes at a constant rate as each feature $x_j$ changes, holding all other features constant.
 
 **Why it matters:** The entire linear regression model is built on the equation $y = X\theta + \varepsilon$. If the true relationship is curved, quadratic, or otherwise non-linear, a straight line will systematically miss the pattern. The model will underfit and the residuals will show clear structure instead of being random.
 
@@ -80,24 +80,24 @@ Linear regression relies on four critical assumptions. If these assumptions are 
 
 **For Simple Linear Regression** (one feature $x$, one target $y$):
 
-1. **Scatterplot of $y$ vs. $x$** — the most direct check. If the relationship looks curved (U-shaped, exponential, logarithmic) instead of forming a straight-line pattern, linearity is violated.
-2. **Residuals vs. predictors ($x$) plot** — plot the residuals ($y - \hat{y}$) against the predictor $x$. If linearity holds, the points scatter randomly around 0. Any systematic pattern (curve, fan shape) signals a violation.
+1. **Scatterplot of $y$ vs. $x$**. the most direct check. If the relationship looks curved (U-shaped, exponential, logarithmic) instead of forming a straight-line pattern, linearity is violated.
+2. **Residuals vs. predictors ($x$) plot**. plot the residuals ($y - \hat{y}$) against the predictor $x$. If linearity holds, the points scatter randomly around 0. Any systematic pattern (curve, fan shape) signals a violation.
 
 **For Multiple Linear Regression** (multiple features $x_1, x_2, \ldots, x_p$):
 
-1. **Residuals vs. fitted values plot** — plot the residuals ($y - \hat{y}$) against the predicted values ($\hat{y}$). If linearity holds, the points should scatter randomly around 0 with no visible pattern. A curved pattern (e.g., residuals are positive at low and high fitted values, negative in the middle) indicates non-linearity.
-2. **Residuals vs. predictors ($x$) plot** — plot residuals against each individual predictor $x_j$ separately. Curvature in any of these plots reveals *which specific predictor* has a non-linear relationship with $y$.
-3. **Partial residual plots** (also called Component + Residual plots) — these isolate the effect of each predictor after removing the influence of all other predictors, making it easier to see the true functional form of each individual relationship. More reliable than simple residual-vs-predictor plots when predictors are correlated.
+1. **Residuals vs. fitted values plot**. plot the residuals ($y - \hat{y}$) against the predicted values ($\hat{y}$). If linearity holds, the points should scatter randomly around 0 with no visible pattern. A curved pattern (e.g., residuals are positive at low and high fitted values, negative in the middle) indicates non-linearity.
+2. **Residuals vs. predictors ($x$) plot**. plot residuals against each individual predictor $x_j$ separately. Curvature in any of these plots reveals *which specific predictor* has a non-linear relationship with $y$.
+3. **Partial residual plots** (also called Component + Residual plots). these isolate the effect of each predictor after removing the influence of all other predictors, making it easier to see the true functional form of each individual relationship. More reliable than simple residual-vs-predictor plots when predictors are correlated.
 
 **For both types:**
 
-- **Domain knowledge** — consider whether a linear relationship is plausible given the context (e.g., diminishing returns on advertising spend suggests a log or square-root relationship, not linear).
+- **Domain knowledge**. consider whether a linear relationship is plausible given the context (e.g., diminishing returns on advertising spend suggests a log or square-root relationship, not linear).
 
 **What to do if violated:**
-- **Add polynomial features** — add $x^2$ if residuals show a U-shape, $x^3$ if residuals show an S-shape. Keep degree $\leq 3$ or $4$ to avoid overfitting and erratic behavior at the boundaries.
-- **Apply non-linear transformations** — use $\log(x)$ if the relationship shows diminishing returns or exponential growth, $\sqrt{x}$ for power-type relationships.
-- **Use regression splines** — divide the predictor range into regions at "knots" and fit low-degree polynomials in each region, constrained to join smoothly. This provides flexibility without the instability of high-degree polynomials.
-- **Switch to a non-linear model** — if transformations are insufficient, consider decision trees, random forests, or neural networks.
+- **Add polynomial features**. add $x^2$ if residuals show a U-shape, $x^3$ if residuals show an S-shape. Keep degree $\leq 3$ or $4$ to avoid overfitting and erratic behavior at the boundaries.
+- **Apply non-linear transformations**. use $\log(x)$ if the relationship shows diminishing returns or exponential growth, $\sqrt{x}$ for power-type relationships.
+- **Use regression splines**. divide the predictor range into regions at "knots" and fit low-degree polynomials in each region, constrained to join smoothly. This provides flexibility without the instability of high-degree polynomials.
+- **Switch to a non-linear model**. if transformations are insufficient, consider decision trees, random forests, or neural networks.
 
 After applying any remedy, refit the model and re-check the diagnostic plots to confirm the fix.
 
@@ -109,13 +109,13 @@ After applying any remedy, refit the model and re-check the diagnostic plots to 
 
 $$\text{Cov}(\varepsilon_i, \varepsilon_j) = 0 \quad \text{for } i \neq j$$
 
-**Why it matters:** If observations are correlated (e.g., time series data where today's value depends on yesterday's), the model underestimates the true variance of the coefficients. This makes standard errors too small, p-values too low, and confidence intervals too narrow — you think your results are more significant than they actually are.
+**Why it matters:** If observations are correlated (e.g., time series data where today's value depends on yesterday's), the model underestimates the true variance of the coefficients. This makes standard errors too small, p-values too low, and confidence intervals too narrow. you think your results are more significant than they actually are.
 
 **How to detect violations:**
-- **Durbin-Watson test** — tests for autocorrelation in residuals. Values near 2 indicate no autocorrelation; values near 0 or 4 indicate positive or negative autocorrelation.
-- Plot residuals in order — if you see patterns (waves, trends), the observations are not independent.
+- **Durbin-Watson test**. tests for autocorrelation in residuals. Values near 2 indicate no autocorrelation; values near 0 or 4 indicate positive or negative autocorrelation.
+- Plot residuals in order. if you see patterns (waves, trends), the observations are not independent.
 
-> **Durbin-Watson Test — Explained:**
+> **Durbin-Watson Test. Explained:**
 >
 > The Durbin-Watson (DW) statistic measures whether consecutive residuals are correlated. It computes the ratio of the sum of squared differences between consecutive residuals to the sum of squared residuals:
 >
@@ -125,17 +125,11 @@ $$\text{Cov}(\varepsilon_i, \varepsilon_j) = 0 \quad \text{for } i \neq j$$
 >
 > | DW value | Meaning | Action |
 > |:---|:---|:---|
-> | **~2** (1.5 – 2.5) | No autocorrelation — residuals are independent | Assumption holds, proceed |
-> | **< 1.5** (toward 0) | Positive autocorrelation — consecutive residuals tend to have the same sign (e.g., several positive in a row, then several negative) | Add lagged features, use time-series models (ARIMA), or GLS |
-> | **> 2.5** (toward 4) | Negative autocorrelation — consecutive residuals alternate signs (positive, negative, positive...) | Rare; investigate data ordering, consider GLS |
+> | **~2** (1.5 – 2.5) | No autocorrelation. residuals are independent | Assumption holds, proceed |
+> | **< 1.5** (toward 0) | Positive autocorrelation. consecutive residuals tend to have the same sign (e.g., several positive in a row, then several negative) | Add lagged features, use time-series models (ARIMA), or GLS |
+> | **> 2.5** (toward 4) | Negative autocorrelation. consecutive residuals alternate signs (positive, negative, positive...) | Rare; investigate data ordering, consider GLS |
 >
 > **When to use it:** Primarily for data with a natural ordering (time series, sequential measurements). For cross-sectional data (no inherent order), independence is usually safe to assume and DW is less relevant.
->
-> ```python
-> from statsmodels.stats.stattools import durbin_watson
-> dw = durbin_watson(residuals)
-> print(f"Durbin-Watson: {dw:.2f}")
-> ```
 
 **What to do if violated:**
 - Use time series models (ARIMA, exponential smoothing) instead.
@@ -146,19 +140,19 @@ $$\text{Cov}(\varepsilon_i, \varepsilon_j) = 0 \quad \text{for } i \neq j$$
 
 ### 3. Homoscedasticity (Constant Variance)
 
-**What it means:** The variance of the residuals (errors) is **constant** across all levels of the predicted values. In other words, the spread of the errors doesn't change — the model is equally uncertain about its predictions whether the target value is small or large.
+**What it means:** The variance of the residuals (errors) is **constant** across all levels of the predicted values. In other words, the spread of the errors doesn't change. the model is equally uncertain about its predictions whether the target value is small or large.
 
-The opposite — **heteroscedasticity** — means the error variance changes. A common example: predicting income, where prediction errors are small for low incomes but very large for high incomes.
+The opposite. **heteroscedasticity**. means the error variance changes. A common example: predicting income, where prediction errors are small for low incomes but very large for high incomes.
 
 **Why it matters:** OLS assumes equal variance to give equal weight to all observations. If variance is larger for some observations, those high-variance points disproportionately influence the model. The coefficient estimates remain unbiased, but:
 - Standard errors are wrong → hypothesis tests and confidence intervals are unreliable.
 - The model is not efficient (not the best possible estimator).
 
 **How to detect violations:**
-- **Residuals vs. fitted values plot** — if the residuals fan out (funnel shape) or form a pattern, variance is not constant.
-- **Breusch-Pagan test** or **White's test** — formal statistical tests for heteroscedasticity.
+- **Residuals vs. fitted values plot**. if the residuals fan out (funnel shape) or form a pattern, variance is not constant.
+- **Breusch-Pagan test** or **White's test**. formal statistical tests for heteroscedasticity.
 
-> **Breusch-Pagan Test — Explained:**
+> **Breusch-Pagan Test. Explained:**
 >
 > The Breusch-Pagan (BP) test checks whether the variance of the residuals depends on the predictor values. It works by regressing the squared residuals ($e_i^2$) on the original predictors ($X$). If the predictors can explain the pattern in the squared residuals, variance is not constant.
 >
@@ -166,40 +160,24 @@ The opposite — **heteroscedasticity** — means the error variance changes. A 
 >
 > | Output | How to interpret |
 > |:---|:---|
-> | **LM statistic** | Test statistic — higher values indicate stronger evidence of heteroscedasticity |
+> | **LM statistic** | Test statistic. higher values indicate stronger evidence of heteroscedasticity |
 > | **p-value** | The probability of seeing this result if homoscedasticity held |
 >
 > | p-value | Interpretation | Action |
 > |:---|:---|:---|
-> | **> 0.05** | No significant heteroscedasticity — variance is approximately constant | Assumption holds, proceed |
-> | **< 0.05** | Heteroscedasticity detected — error variance changes with predicted values | Transform y (log, sqrt), use WLS, or report robust standard errors (HC3) |
-> | **< 0.05 but plot looks OK** | Borderline — large samples can trigger significance easily | Trust the residual plot more than the p-value |
+> | **> 0.05** | No significant heteroscedasticity. variance is approximately constant | Assumption holds, proceed |
+> | **< 0.05** | Heteroscedasticity detected. error variance changes with predicted values | Transform y (log, sqrt), use WLS, or report robust standard errors (HC3) |
+> | **< 0.05 but plot looks OK** | Borderline. large samples can trigger significance easily | Trust the residual plot more than the p-value |
 >
-> ```python
-> from statsmodels.stats.diagnostic import het_breuschpagan
-> import statsmodels.api as sm
->
-> X_with_const = sm.add_constant(X_train)
-> bp_test = het_breuschpagan(residuals, X_with_const)
-> labels = ['LM Statistic', 'LM p-value', 'F Statistic', 'F p-value']
-> print(dict(zip(labels, bp_test)))
-> ```
->
-> **White's Test — Explained:**
+> **White's Test. Explained:**
 >
 > White's test is a more general alternative to Breusch-Pagan. While BP assumes the relationship between variance and predictors is linear, White's test also checks for non-linear patterns by including squared terms and cross-products of the predictors. Use White's test when you suspect the heteroscedasticity has a non-linear form (e.g., variance increases quadratically). For most cases, Breusch-Pagan is sufficient.
->
-> ```python
-> from statsmodels.stats.diagnostic import het_white
-> white_test = het_white(residuals, X_with_const)
-> labels = ['LM Statistic', 'LM p-value', 'F Statistic', 'F p-value']
-> print(dict(zip(labels, white_test)))
-> ```
 
 **What to do if violated:**
 - Apply a transformation to the target variable (e.g., $\log(y)$, $\sqrt{y}$) to stabilize variance.
-- Use **Weighted Least Squares (WLS)** — gives less weight to observations with higher variance.
+- Use **Weighted Least Squares (WLS)**. gives less weight to observations with higher variance.
 - Use **robust standard errors** (heteroscedasticity-consistent standard errors) which give correct p-values even with non-constant variance.
+- Use **robust regression methods** (e.g., Huber regression, RANSAC) that are less sensitive to outliers and heteroscedastic errors.
 
 ---
 
@@ -207,7 +185,7 @@ The opposite — **heteroscedasticity** — means the error variance changes. A 
 
 **What it means:** The residuals $\varepsilon_i = y_i - \hat{y}_i$ follow a **normal (Gaussian) distribution** with mean zero and constant variance: $\varepsilon \sim \mathcal{N}(0, \sigma^2)$.
 
-**Why it matters:** The normality assumption is needed for **statistical inference** — specifically for p-values, t-tests on coefficients, and confidence intervals to be valid. It does **not** affect the OLS estimates themselves (OLS finds the best linear fit regardless of residual distribution), but without normality:
+**Why it matters:** The normality assumption is needed for **statistical inference**. specifically for p-values, t-tests on coefficients, and confidence intervals to be valid. It does **not** affect the OLS estimates themselves (OLS finds the best linear fit regardless of residual distribution), but without normality:
 - You cannot trust whether a coefficient is statistically significant.
 - Confidence intervals may be too wide or too narrow.
 - Prediction intervals will be inaccurate.
@@ -215,11 +193,11 @@ The opposite — **heteroscedasticity** — means the error variance changes. A 
 **Important nuance:** For large samples ($m > 30$), the **Central Limit Theorem** makes the coefficient estimates approximately normal even if the residuals are not. So normality is most critical for small sample sizes.
 
 **How to detect violations:**
-- **Q-Q plot** (quantile-quantile plot) — residuals should fall approximately on a straight line.
-- **Shapiro-Wilk test** or **Kolmogorov-Smirnov test** — formal tests for normality.
-- **Histogram of residuals** — should look roughly bell-shaped.
+- **Q-Q plot** (quantile-quantile plot). residuals should fall approximately on a straight line.
+- **Shapiro-Wilk test** or **Kolmogorov-Smirnov test**. formal tests for normality.
+- **Histogram of residuals**. should look roughly bell-shaped.
 
-> **Shapiro-Wilk Test — Explained:**
+> **Shapiro-Wilk Test. Explained:**
 >
 > The Shapiro-Wilk test is the most powerful normality test for small to moderate samples (n < 5,000). It compares the observed distribution of residuals to what a perfect normal distribution would look like, producing a test statistic W (0 to 1) and a p-value.
 >
@@ -230,19 +208,13 @@ The opposite — **heteroscedasticity** — means the error variance changes. A 
 >
 > | p-value | Interpretation | Action |
 > |:---|:---|:---|
-> | **> 0.05** | Cannot reject normality — residuals are approximately normal | Assumption holds, proceed |
-> | **< 0.05 and n ≤ 30** | Normality violated and sample is small — inference is unreliable | Transform y (Box-Cox, log), remove outliers, or use bootstrapping |
-> | **< 0.05 and n > 30** | Normality violated but CLT applies — coefficient estimates are still approximately normal | Proceed with caution; prediction intervals will be approximate |
+> | **> 0.05** | Cannot reject normality. residuals are approximately normal | Assumption holds, proceed |
+> | **< 0.05 and n ≤ 30** | Normality violated and sample is small. inference is unreliable | Transform y (Box-Cox, log), remove outliers, or use bootstrapping |
+> | **< 0.05 and n > 30** | Normality violated but CLT applies. coefficient estimates are still approximately normal | Proceed with caution; prediction intervals will be approximate |
 >
-> **Important:** With large samples (n > ~500), the Shapiro-Wilk test becomes overly sensitive — it will reject normality even for tiny, practically irrelevant deviations. For large samples, rely on the Q-Q plot visual inspection instead.
+> **Important:** With large samples (n > ~500), the Shapiro-Wilk test becomes overly sensitive. it will reject normality even for tiny, practically irrelevant deviations. For large samples, rely on the Q-Q plot visual inspection instead.
 >
-> ```python
-> from scipy import stats
-> stat, p_value = stats.shapiro(residuals)
-> print(f"Shapiro-Wilk: W={stat:.4f}, p={p_value:.4f}")
-> ```
->
-> **Kolmogorov-Smirnov Test — Explained:**
+> **Kolmogorov-Smirnov Test. Explained:**
 >
 > The Kolmogorov-Smirnov (KS) test compares the cumulative distribution of the residuals to a theoretical normal distribution. It measures the maximum distance between the two curves. Unlike Shapiro-Wilk, it works for any sample size, but it is **less powerful** (less likely to detect non-normality when it exists).
 >
@@ -255,12 +227,6 @@ The opposite — **heteroscedasticity** — means the error variance changes. A 
 > - **n < 5,000** → use Shapiro-Wilk (more powerful)
 > - **n ≥ 5,000** → use KS test or rely on Q-Q plot (Shapiro-Wilk becomes too sensitive)
 > - **Always** → check the Q-Q plot visually alongside any formal test
->
-> ```python
-> from scipy import stats
-> stat, p_value = stats.kstest(residuals, 'norm', args=(residuals.mean(), residuals.std()))
-> print(f"Kolmogorov-Smirnov: stat={stat:.4f}, p={p_value:.4f}")
-> ```
 
 **What to do if violated:**
 - Transform the target variable ($\log(y)$, Box-Cox transformation).
@@ -274,9 +240,9 @@ The opposite — **heteroscedasticity** — means the error variance changes. A 
 
 | Assumption | What It Affects If Violated | Severity |
 |:---|:---|:---|
-| **Linearity** | Biased predictions, systematic errors | High — model is fundamentally wrong |
-| **Independence** | Standard errors, p-values, confidence intervals | High — conclusions are invalid |
-| **Homoscedasticity** | Standard errors, efficiency of estimates | Medium — estimates are OK, but inference is off |
+| **Linearity** | Biased predictions, systematic errors | High. model is fundamentally wrong |
+| **Independence** | Standard errors, p-values, confidence intervals | High. conclusions are invalid |
+| **Homoscedasticity** | Standard errors, efficiency of estimates | Medium. estimates are OK, but inference is off |
 | **Normality** | p-values, confidence intervals, prediction intervals | Low for large samples (CLT helps) |
 
 ---
@@ -287,7 +253,7 @@ The opposite — **heteroscedasticity** — means the error variance changes. A 
 
 The Normal Equation is a **direct analytical formula** that computes the optimal parameters $\theta$ in one step by setting the derivative of the cost function $J(\theta)$ to zero and solving for $\theta$ algebraically.
 
-**Time Complexity:** $O(n^3 + mn^2)$ — computing $X^TX$ costs $O(mn^2)$ and inverting it costs $O(n^3)$. **Space:** $O(mn + n^2)$.
+**Time Complexity:** $O(n^3 + mn^2)$. computing $X^TX$ costs $O(mn^2)$ and inverting it costs $O(n^3)$. **Space:** $O(mn + n^2)$.
 
 **Derivation intuition:**
 
@@ -301,7 +267,7 @@ $$X^T X\theta = X^T y$$
 
 $$\theta = (X^T X)^{-1} X^T y$$
 
-This is called the "Normal Equation" because it comes from setting the gradient **normal** (perpendicular) to the error — the residual vector $(X\theta - y)$ is orthogonal to the column space of $X$ at the optimal solution.
+This is called the "Normal Equation" because it comes from setting the gradient **normal** (perpendicular) to the error. the residual vector $(X\theta - y)$ is orthogonal to the column space of $X$ at the optimal solution.
 
 **Formula:**
 
@@ -342,7 +308,7 @@ Mathematically, the gradient ($\nabla J$) is a vector of partial derivatives tha
 >
 > **Always scale your features before using gradient descent.** Standardization (Z-score) is the most common choice.
 >
-> See **[feature_scaling.md](feature_scaling.md)** for the full guide on Standardization, Min-Max Normalization, and Robust Scaling — including when to use each, advantages/disadvantages, and Python code.
+> See **[feature_scaling.md](feature_scaling.md)** for the full guide on Standardization, Min-Max Normalization, and Robust Scaling. including when to use each, advantages/disadvantages, and Python code.
 
 #### How It Works Step-by-Step
 
@@ -355,7 +321,7 @@ Step 5: Update parameters θ := θ - α · ∇J(θ)
 Step 6: Repeat steps 2-5 until convergence
 ```
 
-![Gradient Descent Convergence](../images/03_gradient_descent_convergence.gif)
+![Gradient Descent Convergence](../../images/03_gradient_descent_convergence.gif)
 
 *Gradient descent with different initial conditions, iteratively stepping toward the minimum. Each step moves $\theta$ in the direction of steepest descent, with step size controlled by the learning rate ($\alpha$) and the gradient magnitude.*
 
@@ -373,9 +339,9 @@ $$\theta := \theta - \frac{\alpha}{m} X^T (X\theta - y)$$
 
 #### The Learning Rate ($\alpha$)
 
-The learning rate $\alpha$ is a **hyperparameter** — a value that is set before training begins and is not learned from the data. It controls the size of each step during gradient descent. Choosing it correctly is critical.
+The learning rate $\alpha$ is a **hyperparameter**. a value that is set before training begins and is not learned from the data. It controls the size of each step during gradient descent. Choosing it correctly is critical.
 
-![Learning Rate Effects](../images/04_learning_rate_effects.png)
+![Learning Rate Effects](../../images/04_learning_rate_effects.png)
 
 | Learning Rate | Effect |
 |:---:|:---:|
@@ -385,17 +351,17 @@ The learning rate $\alpha$ is a **hyperparameter** — a value that is set befor
 
 #### How to Choose the Learning Rate
 
-There is no universal value — it depends on the problem, the data, and whether features are scaled.
+There is no universal value. it depends on the problem, the data, and whether features are scaled.
 
-**Step 1 — Start with a reasonable default:**
+**Step 1. Start with a reasonable default:**
 A good starting point is $\alpha = 0.01$. This works well for most problems when features are scaled.
 
-**Step 2 — Try values on a logarithmic scale:**
+**Step 2. Try values on a logarithmic scale:**
 Test a range of values that increase by roughly 3x each step:
 
 $$\alpha \in \{0.001, \; 0.003, \; 0.01, \; 0.03, \; 0.1, \; 0.3, \; 1.0\}$$
 
-**Step 3 — Plot the cost vs. iterations for each value:**
+**Step 3. Plot the cost vs. iterations for each value:**
 The cost curve tells you everything:
 
 | What You See | What It Means | Action |
@@ -405,69 +371,30 @@ The cost curve tells you everything:
 | Cost oscillates (up and down) | $\alpha$ is slightly too large | Decrease $\alpha$ by half |
 | Cost explodes (increases rapidly, NaN) | $\alpha$ is way too large | Decrease $\alpha$ by 10x |
 
-```python
-# Practical example: testing multiple learning rates
-learning_rates = [0.001, 0.003, 0.01, 0.03, 0.1, 0.3]
-
-for lr in learning_rates:
-    theta = np.zeros(n_features)
-    costs = []
-    for i in range(500):
-        gradient = (1/m) * X.T @ (X @ theta - y)
-        theta = theta - lr * gradient
-        costs.append(compute_cost(X, y, theta))
-    
-    plt.plot(costs, label=f'α = {lr}')
-
-plt.xlabel('Iteration')
-plt.ylabel('Cost')
-plt.legend()
-plt.title('Cost vs Iterations for Different Learning Rates')
-plt.show()
-```
-
-**Step 4 — Pick the largest $\alpha$ that converges smoothly:**
+**Step 4. Pick the largest $\alpha$ that converges smoothly:**
 You want fast convergence without instability. The best $\alpha$ is the largest value where the cost curve still decreases smoothly.
 
 #### Managing the Learning Rate During Training
 
 A fixed learning rate is often good enough for linear regression, but for more complex problems or large datasets, you may want to **decay** the learning rate over time. The idea is: take large steps early (fast progress), then smaller steps later (precision near the minimum).
 
-**1. Step Decay — Reduce by a factor every N epochs:**
+**1. Step Decay. Reduce by a factor every N epochs:**
 
 $$\alpha_t = \alpha_0 \cdot \gamma^{\lfloor t / N \rfloor}$$
 
 Example: Start at $\alpha_0 = 0.1$, multiply by $\gamma = 0.5$ every 100 epochs.
 
-```python
-# Step decay
-def step_decay(epoch, initial_lr=0.1, drop_factor=0.5, drop_every=100):
-    return initial_lr * (drop_factor ** (epoch // drop_every))
-```
-
-**2. Exponential Decay — Smooth continuous reduction:**
+**2. Exponential Decay. Smooth continuous reduction:**
 
 $$\alpha_t = \alpha_0 \cdot e^{-kt}$$
 
 Where $k$ controls how fast the rate decays.
 
-```python
-# Exponential decay
-def exp_decay(epoch, initial_lr=0.1, decay_rate=0.01):
-    return initial_lr * np.exp(-decay_rate * epoch)
-```
-
-**3. Inverse Time Decay — Slow, gradual reduction:**
+**3. Inverse Time Decay. Slow, gradual reduction:**
 
 $$\alpha_t = \frac{\alpha_0}{1 + k \cdot t}$$
 
-```python
-# Inverse time decay
-def time_decay(epoch, initial_lr=0.1, decay_rate=0.01):
-    return initial_lr / (1 + decay_rate * epoch)
-```
-
-**4. Adaptive Methods (most practical) — Let the algorithm decide:**
+**4. Adaptive Methods (most practical). Let the algorithm decide:**
 
 Instead of manually tuning schedules, adaptive optimizers adjust the learning rate automatically per parameter:
 
@@ -477,25 +404,13 @@ Instead of manually tuning schedules, adaptive optimizers adjust the learning ra
 | **RMSProp** | Uses exponential moving average of squared gradients | Non-stationary problems |
 | **Adam** | Combines momentum + RMSProp; adapts per-parameter | Default choice for most problems |
 
-```python
-# In scikit-learn, SGDRegressor supports adaptive learning rates
-from sklearn.linear_model import SGDRegressor
-
-model = SGDRegressor(
-    learning_rate='adaptive',  # reduces lr when loss stops improving
-    eta0=0.01,                 # initial learning rate
-    max_iter=1000
-)
-model.fit(X_train, y_train)
-```
-
 #### Quick Rules of Thumb
 
-1. **Always scale features first** — this makes the choice of $\alpha$ much less sensitive
+1. **Always scale features first**. this makes the choice of $\alpha$ much less sensitive
 2. **Start with $\alpha = 0.01$** and adjust from there
 3. **If cost increases** → $\alpha$ is too large, divide by 10
 4. **If cost barely moves** → $\alpha$ is too small, multiply by 3
-5. **Plot cost vs. iterations** — never skip this, it's your diagnostic tool
+5. **Plot cost vs. iterations**. never skip this, it's your diagnostic tool
 6. **For linear regression specifically**, a fixed learning rate with scaled features is almost always sufficient
 7. **For production / complex models**, use Adam optimizer and let it handle the learning rate
 
@@ -534,7 +449,7 @@ Update:      θ₀ = 0.367 - 0.1·(-1.633)  = 0.530
 
 **Definition:** Batch Gradient Descent computes the gradient of the cost function using the **entire training dataset** at every single update step. It sums the errors across all $m$ samples, calculates the average gradient, and then updates the parameters once per epoch.
 
-**Time Complexity:** $O(mn)$ per iteration, $O(kmn)$ total — where $k$ = number of iterations. 
+**Time Complexity:** $O(mn)$ per iteration, $O(kmn)$ total. where $k$ = number of iterations. 
 **Space:** $O(mn)$ (full dataset in memory).
 
 **Update rule:**
@@ -549,15 +464,15 @@ $$\theta := \theta - \frac{\alpha}{m} \sum_{i=1}^{m} \nabla_\theta L(\hat{y}_i, 
 5. Repeat until convergence.
 
 **Advantages:**
-- ✅ **Stable convergence** — the gradient is exact (no noise), so the cost decreases smoothly at every step.
+- ✅ **Stable convergence**. the gradient is exact (no noise), so the cost decreases smoothly at every step.
 - ✅ **Guaranteed to converge** to the global minimum for convex problems (with appropriate learning rate).
-- ✅ **Deterministic** — same result every run given the same initialization.
-- ✅ **Efficient vectorization** — a single matrix multiplication computes the gradient for all samples at once.
+- ✅ **Deterministic**. same result every run given the same initialization.
+- ✅ **Efficient vectorization**. a single matrix multiplication computes the gradient for all samples at once.
 
 **Disadvantages:**
-- ❌ **Slow for large datasets** — each update requires processing all $m$ samples. If $m = 10$ million, every single step is expensive.
-- ❌ **High memory usage** — the entire dataset must fit in memory to compute the gradient.
-- ❌ **Cannot learn online** — cannot incorporate new data without retraining on the entire dataset.
+- ❌ **Slow for large datasets**. each update requires processing all $m$ samples. If $m = 10$ million, every single step is expensive.
+- ❌ **High memory usage**. the entire dataset must fit in memory to compute the gradient.
+- ❌ **Cannot learn online**. cannot incorporate new data without retraining on the entire dataset.
 - ❌ **Can get stuck in saddle points and local minima** (in non-convex problems) because the gradient is too smooth to escape.
 
 **When to use:** Small to medium datasets (up to ~10,000 samples) where stability is more important than speed.
@@ -583,16 +498,16 @@ $$\theta := \theta - \alpha \, \nabla_\theta L(\hat{y}_i, y_i)$$
 5. Move to the next sample. One pass through all samples = one epoch.
 
 **Advantages:**
-- ✅ **Very fast updates** — each step is $O(n)$ instead of $O(mn)$, making it much faster per iteration.
-- ✅ **Low memory** — only one sample is needed in memory at a time.
-- ✅ **Supports online learning** — can learn from new data as it arrives without retraining from scratch.
-- ✅ **Can escape shallow local minima and saddle points** — the noise from random sampling helps the algorithm explore and avoid getting stuck (beneficial for non-convex problems like neural networks).
+- ✅ **Very fast updates**. each step is $O(n)$ instead of $O(mn)$, making it much faster per iteration.
+- ✅ **Low memory**. only one sample is needed in memory at a time.
+- ✅ **Supports online learning**. can learn from new data as it arrives without retraining from scratch.
+- ✅ **Can escape shallow local minima and saddle points**. the noise from random sampling helps the algorithm explore and avoid getting stuck (beneficial for non-convex problems like neural networks).
 
 **Disadvantages:**
-- ❌ **Noisy, unstable convergence** — the gradient from one sample is a very noisy estimate of the true gradient, causing the parameters to zigzag erratically.
-- ❌ **Never truly converges** — oscillates around the minimum instead of settling on it (unless the learning rate is decayed).
-- ❌ **Cannot exploit vectorized hardware** — processing one sample at a time doesn't benefit from GPU/matrix parallelism.
-- ❌ **Sensitive to learning rate** — too high causes divergence, too low negates the speed advantage.
+- ❌ **Noisy, unstable convergence**. the gradient from one sample is a very noisy estimate of the true gradient, causing the parameters to zigzag erratically.
+- ❌ **Never truly converges**. oscillates around the minimum instead of settling on it (unless the learning rate is decayed).
+- ❌ **Cannot exploit vectorized hardware**. processing one sample at a time doesn't benefit from GPU/matrix parallelism.
+- ❌ **Sensitive to learning rate**. too high causes divergence, too low negates the speed advantage.
 
 **When to use:** Very large datasets, online learning scenarios, or when you need to escape local minima in non-convex optimization.
 
@@ -600,9 +515,9 @@ $$\theta := \theta - \alpha \, \nabla_\theta L(\hat{y}_i, y_i)$$
 
 ##### 3. Mini-Batch Gradient Descent
 
-**Definition:** Mini-Batch Gradient Descent is the **compromise between Batch GD and SGD**. It computes the gradient on a small random subset (mini-batch) of the training data — typically 32 to 256 samples — and updates the parameters once per mini-batch.
+**Definition:** Mini-Batch Gradient Descent is the **compromise between Batch GD and SGD**. It computes the gradient on a small random subset (mini-batch) of the training data. typically 32 to 256 samples. and updates the parameters once per mini-batch.
 
-**Time Complexity:** $O(bn)$ per update, $O(mn)$ per epoch, $O(kmn)$ total — where $b$ = batch size. **Space:** $O(bn)$.
+**Time Complexity:** $O(bn)$ per update, $O(mn)$ per epoch, $O(kmn)$ total. where $b$ = batch size. **Space:** $O(bn)$.
 
 **Update rule (for a mini-batch $B$ of size $b$):**
 
@@ -635,7 +550,7 @@ The batch size is a hyperparameter that affects training speed, convergence beha
 
 | Dataset size ($m$) | Recommended batch size |
 |:---:|:---|
-| $m < 500$ | Use full batch (Batch GD) — dataset is small enough |
+| $m < 500$ | Use full batch (Batch GD). dataset is small enough |
 | $500 < m < 5{,}000$ | 32–64 |
 | $5{,}000 < m < 100{,}000$ | 64–256 |
 | $m > 100{,}000$ | 128–512 (limited by GPU memory) |
@@ -656,22 +571,22 @@ A common rule of thumb: **when you double the batch size, multiply the learning 
 **6. Larger batches ≠ better models.** A counter-intuitive finding in deep learning research: larger batch sizes often lead to **worse** generalization. The noise from small batches helps the optimizer escape sharp, narrow minima and find flatter minima that generalize better. This is called the **generalization gap**.
 
 **Quick decision:**
-- **Default choice:** 32 or 64 — works well in almost all cases.
+- **Default choice:** 32 or 64. works well in almost all cases.
 - **If training is too slow:** increase to 128 or 256 (and increase learning rate proportionally).
 - **If running out of memory:** decrease batch size.
 - **If model overfits:** try a smaller batch size (more noise = implicit regularization).
 - **If loss is very noisy / unstable:** increase batch size for smoother gradients.
 
 **Advantages:**
-- ✅ **Balances speed and stability** — smoother than SGD, faster than Batch GD.
-- ✅ **Exploits vectorized hardware** — GPUs and modern CPUs are optimized for matrix operations on batches, making mini-batch much faster than processing one sample at a time.
-- ✅ **Good generalization** — the moderate noise from mini-batches acts as a form of regularization, often leading to better models than Batch GD.
-- ✅ **Scalable** — works well for datasets of any size.
+- ✅ **Balances speed and stability**. smoother than SGD, faster than Batch GD.
+- ✅ **Exploits vectorized hardware**. GPUs and modern CPUs are optimized for matrix operations on batches, making mini-batch much faster than processing one sample at a time.
+- ✅ **Good generalization**. the moderate noise from mini-batches acts as a form of regularization, often leading to better models than Batch GD.
+- ✅ **Scalable**. works well for datasets of any size.
 
 **Disadvantages:**
-- ❌ **Extra hyperparameter** — you need to choose the batch size $b$ in addition to the learning rate.
-- ❌ **Still oscillates** (less than SGD, more than Batch GD) — requires learning rate scheduling for precise convergence.
-- ❌ **Not deterministic** — results vary between runs due to random shuffling (unless you fix the random seed).
+- ❌ **Extra hyperparameter**. you need to choose the batch size $b$ in addition to the learning rate.
+- ❌ **Still oscillates** (less than SGD, more than Batch GD). requires learning rate scheduling for precise convergence.
+- ❌ **Not deterministic**. results vary between runs due to random shuffling (unless you fix the random seed).
 
 **When to use:** **Almost always.** Mini-batch GD is the default choice in practice for most machine learning and deep learning applications.
 
@@ -690,37 +605,13 @@ A common rule of thumb: **when you double the batch size, multiply the learning 
 | **Hardware utilization** | Good (vectorized) | Poor (scalar) | Best (optimized batch ops) |
 | **Online learning** | ❌ | ✅ | ❌ (but can adapt) |
 | **Escapes local minima** | ❌ | ✅ | Partially |
-| **Default choice?** | Small data only | Rarely used alone | **Yes — standard in practice** |
+| **Default choice?** | Small data only | Rarely used alone | **Yes. standard in practice** |
 
-![Gradient Descent with Momentum - Convergence Paths](../images/05_gd_convergence_paths.svg)
+![Gradient Descent with Momentum - Convergence Paths](../../images/05_gd_convergence_paths.svg)
 
 *Comparison of convergence paths. Batch GD follows a smooth path, SGD zigzags noisily, and Mini-Batch GD balances both.*
 
 **When to Use Gradient Descent (general):** Large datasets with many features (>10,000)
-
-## Python Implementation Summary
-
-**Using Normal Equation:**
-```python
-theta = np.linalg.inv(X.T @ X) @ X.T @ y
-```
-
-**Using Gradient Descent:**
-```python
-for iteration in range(num_iterations):
-    predictions = X @ theta
-    errors = predictions - y
-    gradient = (1/m) * X.T @ errors
-    theta = theta - learning_rate * gradient
-```
-
-**Using Scikit-learn:**
-```python
-from sklearn.linear_model import LinearRegression
-model = LinearRegression()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-```
 
 ## Quick Decision Guide
 
@@ -739,18 +630,18 @@ predictions = model.predict(X_test)
 
 | Scenario | Variant | Why |
 |----------|---------|-----|
-| Small dataset (fits in memory, < 10k) | **Batch GD** | Uses full dataset — stable, exact gradients, converges smoothly |
+| Small dataset (fits in memory, < 10k) | **Batch GD** | Uses full dataset. stable, exact gradients, converges smoothly |
 | Medium dataset (10k–100k) | **Mini-Batch GD** | Best balance of speed and stability |
 | Large dataset (> 100k) | **Mini-Batch GD** | Full-batch is too slow per step; mini-batch exploits GPU parallelism |
-| Very large / streaming data | **Stochastic GD (SGD)** | Updates per sample — fastest per iteration, handles infinite streams |
+| Very large / streaming data | **Stochastic GD (SGD)** | Updates per sample. fastest per iteration, handles infinite streams |
 | Online learning (data arrives continuously) | **SGD** | Processes one sample at a time, adapts to new data immediately |
 | Need fastest convergence (fewest epochs) | **Batch GD** | Most stable gradient → most direct path to minimum |
 | Need fastest wall-clock time | **Mini-Batch GD** | GPU-optimized matrix operations on batches of 32–256 |
 | Highly non-convex loss landscape | **SGD** or **Mini-Batch GD** | Noise in gradient helps escape local minima and saddle points |
-| Need reproducible, deterministic training | **Batch GD** | Same gradient every epoch — no randomness |
+| Need reproducible, deterministic training | **Batch GD** | Same gradient every epoch. no randomness |
 | Limited GPU memory | **SGD** or **small Mini-Batch GD** | Lower memory footprint per step |
 
-> **In practice:** Mini-Batch GD (batch size 32–256) is the most widely used variant. It combines the stability of Batch GD with the speed and regularization benefits of SGD. Pure Batch GD and pure SGD are the two extremes — Mini-Batch sits in the sweet spot.
+> **In practice:** Mini-Batch GD (batch size 32–256) is the most widely used variant. It combines the stability of Batch GD with the speed and regularization benefits of SGD. Pure Batch GD and pure SGD are the two extremes. Mini-Batch sits in the sweet spot.
 
 ---
 
@@ -760,24 +651,24 @@ predictions = model.predict(X_test)
 
 ### Multicollinearity
 
-**What it is:** Two or more independent variables (features) are highly correlated with each other. For example, including both "height in cm" and "height in inches" as features — they carry the same information.
+**What it is:** Two or more independent variables (features) are highly correlated with each other. For example, including both "height in cm" and "height in inches" as features. they carry the same information.
 
 **Why it matters:** When features are correlated, the model cannot determine which one is truly responsible for the effect on $y$. This causes:
-- **Unstable coefficients** — small changes in the data cause coefficients to swing wildly.
-- **Inflated standard errors** — the standard error of a coefficient increases by a factor of $\sqrt{\text{VIF}}$, making p-values unreliable.
-- **Loss of interpretability** — you can't trust individual coefficient values to understand feature importance.
+- **Unstable coefficients**. small changes in the data cause coefficients to swing wildly.
+- **Inflated standard errors**. the standard error of a coefficient increases by a factor of $\sqrt{\text{VIF}}$, making p-values unreliable.
+- **Loss of interpretability**. you can't trust individual coefficient values to understand feature importance.
 
 > **Important caveat:** Multicollinearity affects coefficient interpretation and statistical inference, but it does **NOT** reduce the model's predictive accuracy. If your only goal is prediction (not understanding which features matter), multicollinearity is not a problem.
 
 **How to detect:**
-- **Variance Inflation Factor (VIF)** — the primary diagnostic tool. VIF measures how much a coefficient's variance is inflated due to correlation with other predictors:
+- **Variance Inflation Factor (VIF)**. the primary diagnostic tool. VIF measures how much a coefficient's variance is inflated due to correlation with other predictors:
   - $\text{VIF} < 5$: acceptable (minimal multicollinearity)
   - $5 \leq \text{VIF} \leq 10$: moderate (warrants attention)
   - $\text{VIF} > 10$: severe (requires action)
-- **Correlation matrix** — check pairwise correlations between features. Correlations above $|0.8|$ are a warning sign.
-- **Unstable coefficients** — if adding or removing a feature drastically changes other coefficients, multicollinearity is likely present.
+- **Correlation matrix**. check pairwise correlations between features. Correlations above $|0.8|$ are a warning sign.
+- **Unstable coefficients**. if adding or removing a feature drastically changes other coefficients, multicollinearity is likely present.
 
-> **Variance Inflation Factor (VIF) — Explained:**
+> **Variance Inflation Factor (VIF). Explained:**
 >
 > VIF quantifies how much the variance of a coefficient is inflated because of linear relationships with other predictors. For each feature $x_j$, VIF is computed by regressing $x_j$ on all other features and measuring how well they predict it:
 >
@@ -795,44 +686,33 @@ predictions = model.predict(X_test)
 > | **> 10** | > 90% | Severe multicollinearity | Must act: drop one feature from the correlated pair, use PCA, or use Ridge regression |
 > | **> 100** | > 99% | Near-perfect collinearity | Features are essentially duplicates; drop one immediately |
 >
-> **Practical effect on coefficients:** A VIF of 10 means the standard error of that coefficient is $\sqrt{10} \approx 3.2$ times larger than it would be without multicollinearity. This makes it much harder to detect whether the feature is statistically significant — the p-value inflates and confidence intervals widen.
+> **Practical effect on coefficients:** A VIF of 10 means the standard error of that coefficient is $\sqrt{10} \approx 3.2$ times larger than it would be without multicollinearity. This makes it much harder to detect whether the feature is statistically significant. the p-value inflates and confidence intervals widen.
 >
 > **Important:** VIF requires at least 2 features to be meaningful. For simple linear regression (one feature), multicollinearity does not apply.
 
-```python
-from statsmodels.stats.outliers_influence import variance_inflation_factor
-import pandas as pd
-
-# Compute VIF for each feature
-vif_data = pd.DataFrame()
-vif_data['Feature'] = X_train.columns
-vif_data['VIF'] = [variance_inflation_factor(X_train.values, i) for i in range(X_train.shape[1])]
-print(vif_data.sort_values('VIF', ascending=False))
-```
-
 **Solutions:**
-- **Remove one of the correlated features** — the simplest approach. Drop the feature with the highest VIF.
-- **Combine correlated features** — create a composite variable (e.g., average or sum of correlated features).
-- **PCA (Principal Component Analysis)** — transform correlated features into uncorrelated principal components.
-- **Regularization** — Ridge regression ($L2$) handles multicollinearity well by shrinking correlated coefficients toward each other. See [regularization_techniques.md](../regularization_techniques.md).
+- **Remove one of the correlated features**. the simplest approach. Drop the feature with the highest VIF.
+- **Combine correlated features**. create a composite variable (e.g., average or sum of correlated features).
+- **PCA (Principal Component Analysis)**. transform correlated features into uncorrelated principal components.
+- **Regularization**. Ridge regression ($L2$) handles multicollinearity well by shrinking correlated coefficients toward each other. See [regularization_techniques.md](../regularization_techniques.md).
 
 ---
 
 ### Overfitting
 
-**What it is:** The model fits the training data too well — it has learned the noise and random fluctuations in the training set, not just the underlying pattern. Think of it as "memorizing the answers" instead of "learning the concept."
+**What it is:** The model fits the training data too well. it has learned the noise and random fluctuations in the training set, not just the underlying pattern. Think of it as "memorizing the answers" instead of "learning the concept."
 
 **How to detect:**
-- **Training error is low, but test error is significantly higher** — the defining sign of overfitting.
-- **Learning curves** — plot training and validation error as a function of training set size. If there is a large gap between training error (low) and validation error (high), the model is overfitting.
-- **Too many features relative to samples** — if $p$ (number of features) is close to or exceeds $n$ (number of samples), overfitting is almost guaranteed.
+- **Training error is low, but test error is significantly higher**. the defining sign of overfitting.
+- **Learning curves**. plot training and validation error as a function of training set size. If there is a large gap between training error (low) and validation error (high), the model is overfitting.
+- **Too many features relative to samples**. if $p$ (number of features) is close to or exceeds $n$ (number of samples), overfitting is almost guaranteed.
 
 **Solutions:**
-- **Regularization** (Ridge / Lasso / Elastic Net) — adds a penalty term to the cost function that constrains coefficient magnitudes, preventing the model from fitting noise.
-- **More training data** — makes it harder for the model to memorize individual data points.
-- **Feature selection** — remove irrelevant or redundant features to reduce model complexity.
-- **Cross-validation** — use k-fold cross-validation to evaluate model performance and select hyperparameters.
-- **Reduce polynomial degree** — if using polynomial features, lower the degree.
+- **Regularization** (Ridge / Lasso / Elastic Net). adds a penalty term to the cost function that constrains coefficient magnitudes, preventing the model from fitting noise.
+- **More training data**. makes it harder for the model to memorize individual data points.
+- **Feature selection**. remove irrelevant or redundant features to reduce model complexity.
+- **Cross-validation**. use k-fold cross-validation to evaluate model performance and select hyperparameters.
+- **Reduce polynomial degree**. if using polynomial features, lower the degree.
 
 ---
 
@@ -841,14 +721,14 @@ print(vif_data.sort_values('VIF', ascending=False))
 **What it is:** The model is too simple to capture the underlying pattern in the data. It performs poorly on both training and test data. Think of it as trying to fit a straight line to clearly curved data.
 
 **How to detect:**
-- **Both training and test errors are high** — the model fails to learn even from the data it has seen.
-- **Residual plots show systematic patterns** — if residuals have a clear structure (curves, patterns) rather than random scatter, the model is missing something.
+- **Both training and test errors are high**. the model fails to learn even from the data it has seen.
+- **Residual plots show systematic patterns**. if residuals have a clear structure (curves, patterns) rather than random scatter, the model is missing something.
 
 **Solutions:**
-- **Add polynomial features** — if the relationship is non-linear, adding $x^2$, $x^3$, or interaction terms can capture the curvature. See [polynomial_regression_cheatsheet.md](polynomial_regression_cheatsheet.md).
-- **Add more features** — include additional relevant predictors that carry information about $y$.
-- **Reduce regularization** — if regularization is too strong (very small $C$ or very large $\alpha$), the model is over-constrained. Decrease the penalty.
-- **Use a more complex model** — if linear regression fundamentally cannot capture the relationship, consider decision trees, random forests, SVMs, or neural networks.
+- **Add polynomial features**. if the relationship is non-linear, adding $x^2$, $x^3$, or interaction terms can capture the curvature. See [polynomial_regression_cheatsheet.md](polynomial_regression_cheatsheet.md).
+- **Add more features**. include additional relevant predictors that carry information about $y$.
+- **Reduce regularization**. if regularization is too strong (very small $C$ or very large $\alpha$), the model is over-constrained. Decrease the penalty.
+- **Use a more complex model**. if linear regression fundamentally cannot capture the relationship, consider decision trees, random forests, SVMs, or neural networks.
 
 ---
 
@@ -864,35 +744,13 @@ Once you've trained a linear regression model, you need to measure how well it a
 
 | Metric | Formula | What It Tells You |
 |--------|---------|-------------------|
-| **MSE** | $\frac{1}{m}\sum(y_i - \hat{y}_i)^2$ | Average squared error — penalizes large errors heavily. Used as the training cost function. |
+| **MSE** | $\frac{1}{m}\sum(y_i - \hat{y}_i)^2$ | Average squared error. penalizes large errors heavily. Used as the training cost function. |
 | **RMSE** | $\sqrt{\text{MSE}}$ | Same as MSE but in the original units of $y$. "On average, predictions are off by ~RMSE." |
-| **MAE** | $\frac{1}{m}\sum\|y_i - \hat{y}_i\|$ | Average absolute error — more robust to outliers than RMSE. |
+| **MAE** | $\frac{1}{m}\sum\|y_i - \hat{y}_i\|$ | Average absolute error. more robust to outliers than RMSE. |
 | **R² (Coefficient of Determination)** | $1 - \frac{SS_{res}}{SS_{tot}}$ | Proportion of variance explained. R² = 0.85 means the model explains 85% of the variability in $y$. |
 | **Adjusted R²** | $1 - \frac{(1-R^2)(m-1)}{m-n-1}$ | Like R² but penalizes adding irrelevant features. **Always use this when comparing models with different numbers of features.** |
 
-```python
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-import numpy as np
-
-y_pred = model.predict(X_test)
-
-mse  = mean_squared_error(y_test, y_pred)
-rmse = np.sqrt(mse)
-mae  = mean_absolute_error(y_test, y_pred)
-r2   = r2_score(y_test, y_pred)
-
-# Adjusted R²
-n_features = X_test.shape[1]
-n_samples  = X_test.shape[0]
-adj_r2 = 1 - (1 - r2) * (n_samples - 1) / (n_samples - n_features - 1)
-
-print(f"RMSE: {rmse:.4f}")
-print(f"MAE:  {mae:.4f}")
-print(f"R²:   {r2:.4f}")
-print(f"Adj R²: {adj_r2:.4f}")
-```
-
-**Quick guide — which metric to pick:**
+**Quick guide. which metric to pick:**
 - **Reporting results?** → RMSE (interpretable units) or MAE (robust to outliers)
 - **Comparing models with different feature counts?** → Adjusted R²
 - **Data has outliers?** → MAE or Median Absolute Error
@@ -908,44 +766,15 @@ Residuals are the differences between actual and predicted values: $e_i = y_i - 
 
 | Pattern | What It Means | Action |
 |---------|---------------|--------|
-| **Random scatter** around zero | Assumptions are met — good model | None needed |
-| **Funnel shape** (spread increases) | Heteroscedasticity — variance is not constant | Log-transform $y$, or use Weighted Least Squares |
-| **Curved pattern** (U-shape, arch) | Non-linearity — the model is missing a pattern | Add polynomial features or interaction terms |
+| **Random scatter** around zero | Assumptions are met. good model | None needed |
+| **Funnel shape** (spread increases) | Heteroscedasticity. variance is not constant | Log-transform $y$, or use Weighted Least Squares |
+| **Curved pattern** (U-shape, arch) | Non-linearity. the model is missing a pattern | Add polynomial features or interaction terms |
 | **Clusters or groups** | Subgroups in data with different behaviors | Add a categorical feature, or fit separate models |
 
-```python
-import matplotlib.pyplot as plt
-
-residuals = y_test - y_pred
-
-fig, axes = plt.subplots(1, 3, figsize=(15, 4))
-
-# 1. Residuals vs Predicted
-axes[0].scatter(y_pred, residuals, alpha=0.5, edgecolors='k', linewidths=0.5)
-axes[0].axhline(y=0, color='r', linestyle='--')
-axes[0].set_xlabel('Predicted values')
-axes[0].set_ylabel('Residuals')
-axes[0].set_title('Residuals vs Predicted')
-
-# 2. Histogram of residuals (should be ~normal)
-axes[1].hist(residuals, bins=30, edgecolor='k', alpha=0.7)
-axes[1].set_xlabel('Residual value')
-axes[1].set_ylabel('Frequency')
-axes[1].set_title('Residual Distribution')
-
-# 3. Q-Q plot (points should follow the diagonal)
-from scipy import stats
-stats.probplot(residuals, plot=axes[2])
-axes[2].set_title('Q-Q Plot')
-
-plt.tight_layout()
-plt.show()
-```
-
 **The three plots above answer three questions:**
-1. **Residuals vs Predicted** — Are there patterns? (checks linearity and homoscedasticity)
-2. **Histogram** — Are residuals normally distributed? (checks normality assumption)
-3. **Q-Q Plot** — Do residuals follow a theoretical normal distribution? (more precise normality check — points should lie on the diagonal line)
+1. **Residuals vs Predicted**. Are there patterns? (checks linearity and homoscedasticity)
+2. **Histogram**. Are residuals normally distributed? (checks normality assumption)
+3. **Q-Q Plot**. Do residuals follow a theoretical normal distribution? (more precise normality check. points should lie on the diagonal line)
 
 ---
 
@@ -953,70 +782,26 @@ plt.show()
 
 A single train/test split can give misleading results depending on how the data was divided. **Cross-validation** provides a more reliable estimate of model performance by testing on multiple different splits.
 
-**K-Fold Cross-Validation** — the most common approach:
+**K-Fold Cross-Validation**. the most common approach:
 1. Split data into $k$ equally sized folds (typically $k = 5$ or $k = 10$)
 2. For each fold: train on $k-1$ folds, evaluate on the remaining fold
 3. Average the $k$ scores to get the final performance estimate
 
-```python
-from sklearn.model_selection import cross_val_score
-from sklearn.linear_model import LinearRegression
-
-model = LinearRegression()
-
-# 5-fold cross-validation using negative MSE (sklearn convention: higher = better)
-cv_scores = cross_val_score(model, X, y, cv=5, scoring='neg_mean_squared_error')
-cv_rmse = np.sqrt(-cv_scores)
-
-print(f"RMSE per fold: {cv_rmse}")
-print(f"Mean RMSE:     {cv_rmse.mean():.4f} ± {cv_rmse.std():.4f}")
-```
-
 **Why use cross-validation?**
-- **More reliable** than a single train/test split — averages over multiple splits
+- **More reliable** than a single train/test split. averages over multiple splits
 - **Uses all data** for both training and validation (every sample gets tested exactly once)
-- **Detects overfitting** — if there's a large gap between training and CV scores, the model is overfitting
+- **Detects overfitting**. if there's a large gap between training and CV scores, the model is overfitting
 
 **When to use which $k$:**
 | Value of $k$ | Use Case |
 |--------------|----------|
-| $k = 5$ | Default — good balance between bias and variance of the estimate |
+| $k = 5$ | Default. good balance between bias and variance of the estimate |
 | $k = 10$ | Slightly more reliable, but 2x slower |
 | $k = m$ (LOO-CV) | Very small datasets where every sample counts. Computationally expensive for large $m$ |
 
 ---
 
 ### Putting It All Together: Full Evaluation Workflow
-
-```python
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-import numpy as np
-
-# 1. Split data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# 2. Train model
-model = LinearRegression()
-model.fit(X_train, y_train)
-
-# 3. Predict
-y_pred = model.predict(X_test)
-
-# 4. Metrics
-print("=== Test Set Performance ===")
-print(f"RMSE:     {np.sqrt(mean_squared_error(y_test, y_pred)):.4f}")
-print(f"MAE:      {mean_absolute_error(y_test, y_pred):.4f}")
-print(f"R²:       {r2_score(y_test, y_pred):.4f}")
-
-# 5. Cross-validation (on full data for a more reliable estimate)
-cv_rmse = np.sqrt(-cross_val_score(model, X, y, cv=5, scoring='neg_mean_squared_error'))
-print(f"\n=== 5-Fold Cross-Validation ===")
-print(f"Mean RMSE: {cv_rmse.mean():.4f} ± {cv_rmse.std():.4f}")
-
-# 6. Check residuals visually (see residual analysis section above)
-```
 
 **Interpretation checklist:**
 - R² > 0.7 → model explains a meaningful amount of variance

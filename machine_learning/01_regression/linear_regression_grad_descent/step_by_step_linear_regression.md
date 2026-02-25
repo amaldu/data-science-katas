@@ -1,6 +1,6 @@
-# Linear Regression: End-to-End Implementation Guide
+# Linear Regression. End-to-End Implementation Guide
 
-> A step-by-step workflow from raw data to evaluated model, with decision points at every stage. This guide connects the theory from the [Linear Regression Cheatsheet](linear_regression_and_grad_descent_cheatsheet.md) to a practical implementation sequence.
+> Implementation guide for Linear Regression. Theory and background in [cheatsheet_linear_regression_and_grad_descent.md](cheatsheet_linear_regression_and_grad_descent.md).
 
 ---
 
@@ -108,7 +108,7 @@ Look for:
 - **|r| > 0.7** -- strong linear relationship, good candidate for simple linear regression.
 - **|r| between 0.3 and 0.7** -- moderate relationship; linear regression may work but expect lower R-squared.
 - **|r| < 0.3** -- weak linear relationship; the feature may not be useful on its own, or the relationship is non-linear.
-- **p-value < 0.05** -- the correlation is statistically significant, meaning you can reject the null hypothesis that r = 0 (the relationship is real, not due to chance). However, statistical significance alone does not imply a *strong* relationship — with large samples, even a small r can reach p < 0.05. Always pair the p-value with the magnitude of r.
+- **p-value < 0.05** -- the correlation is statistically significant, meaning you can reject the null hypothesis that r = 0 (the relationship is real, not due to chance). However, statistical significance alone does not imply a *strong* relationship. With large samples, even a small r can reach p < 0.05. Always pair the p-value with the magnitude of r.
 - **Non-linear pattern** in the scatter plot -- flag for polynomial features in Step 3.
 
 ### 1.5 Encode Categorical Features

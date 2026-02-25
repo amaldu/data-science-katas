@@ -30,8 +30,8 @@ The default threshold is 0.5, but it **should be adjusted** depending on the pro
 
 **Criteria for choosing the threshold:**
 
-**1. Cost of errors — the most important factor.**
-Ask: "Which mistake is worse — a false positive or a false negative?"
+**1. Cost of errors. The most important factor.**
+Ask: "Which mistake is worse. A false positive or a false negative?"
 
 - **False negatives are worse** (missing cancer, missing fraud) → **lower the threshold** (e.g., 0.2–0.4). You'd rather flag more cases and investigate, even if some turn out to be false alarms.
 - **False positives are worse** (blocking a legitimate email, unnecessary surgery) → **raise the threshold** (e.g., 0.6–0.8). You only want to act when the model is highly confident.
@@ -41,51 +41,13 @@ Ask: "Which mistake is worse — a false positive or a false negative?"
 When the positive class is rare (e.g., 1% fraud), the default 0.5 threshold often predicts almost everything as negative. Lowering the threshold helps the model detect more of the rare positive class.
 
 **3. Use the Precision-Recall curve.**
-Plot precision and recall at every threshold and pick the point that best fits your business requirement:
-
-```python
-from sklearn.metrics import precision_recall_curve
-
-precisions, recalls, thresholds = precision_recall_curve(y_true, y_scores)
-
-# Find threshold that gives at least 90% recall
-for p, r, t in zip(precisions, recalls, thresholds):
-    if r >= 0.90:
-        print(f"Threshold: {t:.3f}, Precision: {p:.3f}, Recall: {r:.3f}")
-        break
-```
+Plot precision and recall at every threshold and pick the point that best fits your business requirement.
 
 **4. Optimize for a specific metric.**
-Choose the threshold that maximizes the metric you care about:
-
-```python
-from sklearn.metrics import f1_score
-import numpy as np
-
-# Find threshold that maximizes F1 score
-best_f1, best_threshold = 0, 0.5
-for t in np.arange(0.1, 0.9, 0.01):
-    y_pred = (y_scores >= t).astype(int)
-    f1 = f1_score(y_true, y_pred)
-    if f1 > best_f1:
-        best_f1 = f1
-        best_threshold = t
-
-print(f"Best threshold: {best_threshold:.2f}, F1: {best_f1:.3f}")
-```
+Choose the threshold that maximizes the metric you care about (e.g., F1 score).
 
 **5. Use the ROC curve.**
-The Youden's J statistic picks the threshold that maximizes $\text{TPR} - \text{FPR}$ (the point on the ROC curve farthest from the diagonal):
-
-```python
-from sklearn.metrics import roc_curve
-
-fpr, tpr, thresholds = roc_curve(y_true, y_scores)
-j_scores = tpr - fpr
-best_idx = np.argmax(j_scores)
-best_threshold = thresholds[best_idx]
-print(f"Optimal threshold (Youden's J): {best_threshold:.3f}")
-```
+The Youden's J statistic picks the threshold that maximizes $\text{TPR} - \text{FPR}$ (the point on the ROC curve farthest from the diagonal).
 
 **Key takeaway:** The threshold is a **business decision**, not a purely technical one. Always involve domain experts when choosing it, and never assume 0.5 is optimal.
 
@@ -95,7 +57,7 @@ print(f"Optimal threshold (Youden's J): {best_threshold:.3f}")
 σ(z) = 1 / (1 + e⁻ᶻ)
 ```
 
-![Sigmoid Function](../images/15_sigmoid_function.svg)
+![Sigmoid Function](../../images/15_sigmoid_function.svg)
 
 *The sigmoid (logistic) function maps any real-valued input to the range (0, 1). At z = 0 it outputs 0.5; large positive z approaches 1; large negative z approaches 0.*
 
@@ -128,25 +90,25 @@ Since products are numerically unstable and hard to differentiate, we take the *
 
 $$\log L(\theta) = \sum_{i=1}^{m} \left[ y_i \log(\hat{p}_i) + (1 - y_i) \log(1 - \hat{p}_i) \right]$$
 
-**Maximizing** the log-likelihood is equivalent to **minimizing** the negative log-likelihood — which is exactly the **Binary Cross-Entropy** cost function:
+**Maximizing** the log-likelihood is equivalent to **minimizing** the negative log-likelihood. This is exactly the **Binary Cross-Entropy** cost function:
 
 $$J(\theta) = -\frac{1}{m} \log L(\theta)$$
 
-This is why the cost function for logistic regression has its specific form — it comes directly from the MLE principle.
+This is why the cost function for logistic regression has its specific form. It comes directly from the MLE principle.
 
 Logistic Regression must be solved **iteratively** using optimization algorithms (Gradient Descent, Newton's Method, L-BFGS).
 
 ## Hypothesis Function
 
-The hypothesis function is the **complete prediction model** — it takes input features and produces a probability that the sample belongs to class 1. It has two stages: a linear combination followed by the sigmoid transformation.
+The hypothesis function is the **complete prediction model**. It takes input features and produces a probability that the sample belongs to class 1. It has two stages: a linear combination followed by the sigmoid transformation.
 
-**Stage 1 — Linear combination (same as Linear Regression):**
+**Stage 1. Linear combination (same as Linear Regression):**
 
 $$z = X\theta = \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \cdots + \theta_n x_n$$
 
 This computes a raw score $z$ (called the **logit** or **log-odds**) that can range from $-\infty$ to $+\infty$. A positive $z$ means the model leans toward class 1; a negative $z$ leans toward class 0.
 
-**Stage 2 — Sigmoid transformation (converts score to probability):**
+**Stage 2. Sigmoid transformation (converts score to probability):**
 
 $$\hat{y} = \sigma(z) = \sigma(X\theta) = \frac{1}{1 + e^{-X\theta}}$$
 
@@ -159,7 +121,7 @@ $$z = X\theta \qquad \hat{y} = \sigma(X\theta)$$
 **Where each component means:**
 - $X$ = feature matrix $(m \times n)$, with a bias column of ones prepended. Each row is one sample, each column is one feature.
 - $\theta$ = parameter vector $[\theta_0, \theta_1, \ldots, \theta_n]^T$. These are the weights the model learns during training. $\theta_0$ is the intercept (bias).
-- $z = X\theta$ = the **logit** — a linear score for each sample. Positive = more likely class 1, negative = more likely class 0.
+- $z = X\theta$ = the **logit**. A linear score for each sample. Positive = more likely class 1, negative = more likely class 0.
 - $\sigma(\cdot)$ = the sigmoid function, applied element-wise. Converts each logit into a probability.
 - $\hat{y}$ = predicted probabilities, one per sample. $\hat{y}_i \in (0, 1)$.
 
@@ -188,7 +150,7 @@ Logistic Regression makes several assumptions. Violating them can lead to unreli
 
 ### 2. Independence of Observations
 
-**What it means:** Each data point must be independent of the others — the outcome of one observation should not influence or predict the outcome of another.
+**What it means:** Each data point must be independent of the others. The outcome of one observation should not influence or predict the outcome of another.
 
 **Why it matters:** Correlated observations (e.g., repeated measurements on the same patient, time series data) violate this assumption. The model underestimates the standard errors of coefficients, making significance tests unreliable (p-values too small, confidence intervals too narrow).
 
@@ -200,7 +162,7 @@ Logistic Regression makes several assumptions. Violating them can lead to unreli
 
 **What it means:** The independent features should not be highly correlated with each other. Moderate correlation is acceptable, but very high correlation (e.g., $|r| > 0.9$) causes problems.
 
-**Why it matters:** Multicollinearity inflates the variance of coefficient estimates, making them unstable and hard to interpret. The model still predicts well overall, but individual coefficients become unreliable — small changes in data can flip their signs.
+**Why it matters:** Multicollinearity inflates the variance of coefficient estimates, making them unstable and hard to interpret. The model still predicts well overall, but individual coefficients become unreliable. Small changes in data can flip their signs.
 
 **How to detect:** Compute the Variance Inflation Factor (VIF) for each feature. VIF $> 5-10$ indicates problematic multicollinearity.
 
@@ -214,7 +176,7 @@ Logistic Regression makes several assumptions. Violating them can lead to unreli
 
 $$\log\left(\frac{p}{1-p}\right) = \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \cdots + \theta_n x_n$$
 
-This does NOT mean the relationship between features and probability is linear — the sigmoid makes it non-linear. But the relationship between features and **log-odds** must be linear.
+This does NOT mean the relationship between features and probability is linear. The sigmoid makes it non-linear. But the relationship between features and **log-odds** must be linear.
 
 **Why it matters:** If the true relationship between a feature and the log-odds is curved (e.g., U-shaped), the model will misrepresent it, leading to biased coefficients and poor predictions.
 
@@ -228,7 +190,7 @@ This does NOT mean the relationship between features and probability is linear �
 
 **What it means:** Logistic Regression requires a sufficiently large number of samples, especially relative to the number of features and the rarity of the minority class.
 
-**Why it matters:** With small samples, MLE can produce unreliable estimates — coefficients may be extreme, standard errors inflated, and the model may not converge. A common rule of thumb is at least **10–20 events per predictor variable** (EPV), where "events" refers to the count of the minority class.
+**Why it matters:** With small samples, MLE can produce unreliable estimates. Coefficients may be extreme, standard errors inflated, and the model may not converge. A common rule of thumb is at least **10–20 events per predictor variable** (EPV), where "events" refers to the count of the minority class.
 
 **What to do if sample is small:** Reduce the number of features, use regularization (L1/L2), apply penalized MLE (Firth's method), or collect more data.
 
@@ -272,13 +234,13 @@ Logistic regression is inherently binary, but can be extended:
 - Train K separate binary classifiers (one per class)
 - Each classifier: "class k" vs "everything else"
 - Predict class with highest probability
-- **Time Complexity:** Training: $O(K \cdot kmn)$ — train $K$ separate models. Prediction: $O(Kn)$ — evaluate all $K$ classifiers.
+- **Time Complexity:** Training: $O(K \cdot kmn)$. Train $K$ separate models. Prediction: $O(Kn)$. Evaluate all $K$ classifiers.
 
 ### One-vs-One (OvO)
 - Train K(K−1)/2 classifiers (one per class pair)
 - Each classifier distinguishes between two classes
 - Predict by majority vote
-- **Time Complexity:** Training: $O(\frac{K(K-1)}{2} \cdot km'n)$ — train $K(K-1)/2$ models, each on a subset of $m' < m$ samples. Prediction: $O(\frac{K(K-1)}{2} \cdot n)$.
+- **Time Complexity:** Training: $O(\frac{K(K-1)}{2} \cdot km'n)$. Train $K(K-1)/2$ models, each on a subset of $m' < m$ samples. Prediction: $O(\frac{K(K-1)}{2} \cdot n)$.
 
 ### Softmax Regression (Multinomial)
 - Generalizes logistic regression to K classes directly
@@ -287,7 +249,7 @@ Logistic regression is inherently binary, but can be extended:
 P(y = k) = e^(θₖᵀx) / Σⱼ₌₁ᴷ e^(θⱼᵀx)
 ```
 - Cost function: Categorical Cross-Entropy
-- **Time Complexity:** Training: $O(kmKn)$ — one gradient step is $O(mKn)$ since $\Theta$ is an $n \times K$ matrix. Prediction: $O(Kn)$ — compute $K$ scores and softmax.
+- **Time Complexity:** Training: $O(kmKn)$. One gradient step is $O(mKn)$ since $\Theta$ is an $n \times K$ matrix. Prediction: $O(Kn)$. Compute $K$ scores and softmax.
 
 ## Regularization
 
@@ -307,40 +269,7 @@ J(θ) = −(1/m) Σ[y log(ŷ) + (1−y) log(1−ŷ)] + (λ/m) Σⱼ₌₁ⁿ |θ
 
 ## Evaluation Metrics
 
-> For a full guide on classification metrics, see **[classification_metrics_cheatsheet.md](classification_metrics_cheatsheet.md)** — covering Accuracy, Precision, Recall, F1, ROC-AUC, PR-AUC, Log Loss, Cohen's Kappa, and multiclass extensions.
-
-## Python Implementation Summary
-
-**From scratch:**
-```python
-# Sigmoid
-def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
-
-# Cost
-def cost(X, y, theta):
-    m = len(y)
-    h = sigmoid(X @ theta)
-    return -(1/m) * (y @ np.log(h) + (1-y) @ np.log(1-h))
-
-# Gradient
-def gradient(X, y, theta):
-    m = len(y)
-    h = sigmoid(X @ theta)
-    return (1/m) * X.T @ (h - y)
-
-# Update
-theta = theta - learning_rate * gradient(X, y, theta)
-```
-
-**Using Scikit-learn:**
-```python
-from sklearn.linear_model import LogisticRegression
-model = LogisticRegression()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-probabilities = model.predict_proba(X_test)
-```
+> For a full guide on classification metrics, see **[classification_metrics_cheatsheet.md](classification_metrics_cheatsheet.md)**. Covers Accuracy, Precision, Recall, F1, ROC-AUC, PR-AUC, Log Loss, Cohen's Kappa, and multiclass extensions.
 
 ## Common Pitfalls
 
