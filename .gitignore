@@ -11,7 +11,7 @@ langgraph/agents/r/
 # Audio text-to-speech files
 **/audios/
 
-# Machine learning: only track exercises/, data/, and images/
+# Machine learning: only track exercises/ and data/raw/
 machine_learning/**
 !machine_learning/*/
 !machine_learning/*/*/
@@ -20,8 +20,8 @@ machine_learning/**
 !machine_learning/*/*/exercises/
 !machine_learning/*/*/exercises/**
 !machine_learning/*/data/
-!machine_learning/*/data/**
+!machine_learning/*/data/raw/
+!machine_learning/*/data/raw/**
 !machine_learning/*/*/data/
-!machine_learning/*/*/data/**
-!machine_learning/images/
-!machine_learning/images/**
+!machine_learning/*/*/data/raw/
+!machine_learning/*/*/data/raw/**
