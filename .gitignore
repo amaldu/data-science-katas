@@ -8,8 +8,20 @@ langgraph/agents/r/
 .env
 .cursor/
 
-# Downloaded datasets
-**/data/raw/
-
 # Audio text-to-speech files
 **/audios/
+
+# Machine learning: only track exercises/, data/, and images/
+machine_learning/**
+!machine_learning/*/
+!machine_learning/*/*/
+!machine_learning/*/exercises/
+!machine_learning/*/exercises/**
+!machine_learning/*/*/exercises/
+!machine_learning/*/*/exercises/**
+!machine_learning/*/data/
+!machine_learning/*/data/**
+!machine_learning/*/*/data/
+!machine_learning/*/*/data/**
+!machine_learning/images/
+!machine_learning/images/**
