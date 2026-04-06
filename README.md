@@ -1,72 +1,183 @@
-# Katas exercises for Data Science
+# Data Science Katas
 
-If you find this project useful, consider giving it a ⭐ **star** so it helps others discover it and keeps me motivated!
+A hands-on collection of **250+ exercises, cheatsheets, and interview prep materials** covering the core skills tested in Data Science and ML Engineering interviews.
 
-Contributions are welcome! 🍴 **Fork** my repository, make your changes, and open a pull request!
+Every section follows a **question / solution** format so you can practice actively, not just read passively.
 
---- 
+If you find this useful, a **star** helps others discover it and keeps me motivated.
 
-In order to work with the virtual environment created with Poetry and the jupyter notebooks follow the next steps:
+---
 
+## What's Inside
 
-### 1. Create and Activate the Poetry Environment
-If you haven’t initialized the environment yet, run:
+| Section | Exercises | Format | Topics |
+|---|---|---|---|
+| [Python OOP](#python-oop) | 40+ | Notebooks + `.py` | Classes, inheritance, encapsulation, polymorphism, dunder methods, abstract classes |
+| [SQL](#sql) | 30 sets | Notebooks + PostgreSQL | Joins, CTEs, window functions, subqueries + 22 real-world applied scenarios |
+| [Machine Learning](#machine-learning) | 10+ notebooks, 28 cheatsheets | Notebooks + Markdown | EDA, regression, SVMs, trees, ensembles, PCA, metrics, feature engineering |
+| [PyTorch](#pytorch) | 2 tutorials + cheatsheet | Notebooks | Tensors, model building, training loops, neural net fundamentals |
+| [LangGraph](#langgraph) | 10 exercises | Notebooks | Graph construction, conditional/looping flows, ReAct agents, RAG agents |
+| [A/B Testing](#ab-testing) | 5 notebooks + 3 cheatsheets | Notebooks + Markdown | Frequentist tests, Bayesian testing, multivariant tests, interview Q&A |
+| [Algorithms & Data Structures](#algorithms--data-structures) | 10 implementations + theory | `.py` + Markdown | Search, sorting, arrays, linked lists, hash tables, heaps, Big-O |
+
+---
+
+## Python OOP
+
+Practice object-oriented Python from first principles through advanced patterns.
+
+```
+python/
+├── classes 101/         # 8 notebook pairs: instances, class vars, methods,
+│                        #   inheritance, dunder methods, property decorators,
+│                        #   abstract classes
+├── encapsulation/       # 6 exercise pairs
+├── polymorphism/        # 2 notebook pairs + 10 extra .py exercises
+└── extra_inheritance/   # 8 .py exercise pairs
+```
+
+## SQL
+
+8 foundational topics plus 22 real-world applied scenarios, all runnable against a local PostgreSQL container.
+
+```
+sql/
+├── basic_exercises/     # CREATE/INSERT, SELECT/GROUP BY, UNION, JOINs,
+│                        #   CTEs, subqueries, window functions
+├── applied_exercises/   # 22 scenarios: events, trades, viewership,
+│                        #   transactions, sessions, reviews, signups...
+├── migrations/          # DDL/DML scripts for each applied exercise
+├── theory_questions.ipynb
+└── migrate.py           # One command to set up all tables
+```
+
+**Setup:** requires Docker. See [SQL setup instructions](#instructions-on-how-to-run-the-sql-exercises) below.
+
+## Machine Learning
+
+Cheatsheets and hands-on notebooks spanning the full ML interview syllabus.
+
+```
+machine_learning/
+├── 00_eda/              # Univariate, bivariate, multivariate EDA guides
+├── 01_regression/       # Linear, logistic, polynomial (notebooks + cheatsheets + QA)
+├── 02_SVMs/             # Exercise, cheatsheet, QA
+├── 03_decision_trees/   # Cheatsheet + QA
+├── 04_ensemble_learning_random_forests/
+├── 05_dimensionality_reduction/
+├── 06_metrics/          # Regression + classification metrics
+└── 07_feature_engineering/  # 9 cheatsheets: missing data, encoding, scaling,
+                             #   outliers, feature selection, class imbalance,
+                             #   splitting, pipelines, regularization
+```
+
+## PyTorch
+
+Neural network fundamentals and hands-on PyTorch workflows.
+
+```
+pytorch/
+├── intro_nn_cheatsheet.md         # Neurons, perceptrons, activations, backprop
+└── tutorials/
+    ├── 00_pytorch_fundamentals.ipynb  # Tensors and operations
+    └── 01_pytorch_workflow.ipynb      # Model building and training loops
+```
+
+## LangGraph
+
+Build agentic LLM applications from simple graphs to full RAG agents.
+
+```
+langgraph/
+├── 01-05 graph exercises   # Sequential, conditional, looping graphs
+└── agents/
+    ├── 01_simple_bot        # Basic chatbot
+    ├── 02_agent_bot         # Tool-using agent
+    ├── 03_react_agent       # ReAct pattern
+    ├── 04_agent_drafter     # Drafting agent
+    └── 05_rag_agent         # Retrieval-augmented generation
+```
+
+## A/B Testing
+
+End-to-end experimentation: theory, statistical tests, and hands-on notebooks.
+
+```
+ab_testing/
+├── AB_TESTING_CHEATSHEET.md          # Full workflow: hypotheses to decisions
+├── AB_TESTING_GUIDELINE.md           # Step-by-step with PICOT criteria
+├── ab_testing_statistical_tests.md   # Z-test, t-test, chi-square, Mann-Whitney,
+│                                     #   bootstrap, Bayesian, ANOVA...
+├── 01_ecommerce_conversion_rate      # Frequentist conversion test
+├── 02_saas_session_duration           # Session duration test
+├── 03_bayesian_ab_testing            # Bayesian approach
+├── 04_multivariant_landing_page      # Multivariant test
+└── 05_ab_testing_interview_qa        # Interview Q&A
+```
+
+## Algorithms & Data Structures
+
+Core implementations and theory notes for coding interviews.
+
+```
+algorithms_data_structures/
+├── algorithms/          # linear search, binary search (iterative + recursive),
+│                        #   quicksort, merge sort (array + linked list)
+├── data_structures/     # arrays, linked lists, hash tables
+└── NOTES.md             # Theory: stacks, queues, heaps, union find, Big-O
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Python >= 3.10
+- [Poetry](https://python-poetry.org/)
+- [Docker](https://www.docker.com/) (for SQL exercises only)
+
+### Installation
 
 ```sh
-poetry install  # Create the environment and install dependencies
+git clone https://github.com/amaldu/data-science-katas.git
+cd data-science-katas
+poetry install
 poetry shell
 ```
 
-To verify the environment path:
+### Jupyter Kernel Setup
 
 ```sh
-poetry env info --path
+poetry run python -m ipykernel install --user --name=ds-katas --display-name "DS Katas"
 ```
 
-### 2. Add the Kernel to Jupyter
+Then select the **DS Katas** kernel when opening notebooks in VS Code or Jupyter.
+
+### Instructions on How to Run the SQL Exercises
+
+1. Make sure Docker is running
+2. Start the PostgreSQL container:
 
 ```sh
-poetry run python -m ipykernel install --user --name=myenv --display-name"name-to-display"
+docker compose up -d
 ```
-Replace `name-to-display` with a name that is easy to differentiate from the other environemts you work with
 
-###  3. Select the Kernel in VSCode
-1. Open any notebook you want to work in
-2. Click on top right `Select Kernel`
-3. Find the `name-to-display` that you previously decided
+3. Connect using the PostgreSQL extension in VS Code (credentials are in `docker-compose.yaml`)
+4. Run the migration script to create all tables:
 
-
-## Instructions on how to run server for SQL exercises
-
-☝️ You need to install few things before:
-   1. Docker
-   2. Docker extension
-   3. PostgreSQL extension
-
-### 1. Open the docker-compose.yaml
-
-   ⚠️ Before moving forward, check that the image version suits your environment and it's not from the Jurassic
-
-### 2. Run the PostgreSQL container by clicking on `▷ Run service`
-### 3. Click on the Elephant (left bar) aka PostgreSQL extension 
-   
-Add a new connection and fill the required fields with the values from `docker-compose.yaml`. Test & Save & Connect.
-
-   <p align="center">
-  <img src="sql/imgs/connect-to-server.png" alt="SQL connect server" width="400" />
-</p>
-
-### 4. Run the script `migrate.py`
-
-```
+```sh
 poetry run python sql/migrate.py
 ```
-Refresh localhost postgres and you should see them:
 
+5. Open any notebook in `sql/` and add `%%sql` at the top of SQL cells
 
-   <p align="center">
-  <img src="sql/imgs/postgres-tables.png" alt="SQL tables" width="300" />
-</p>
+---
 
-Remember that in order to execute the cells on jupyter nobook with SQL code you have to add ```%%sql``` at the begining
+## Contributing
 
+Found an error or want to add exercises? Open an issue or submit a PR.
+
+## License
+
+MIT
