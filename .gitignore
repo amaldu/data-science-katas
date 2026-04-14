@@ -27,3 +27,4 @@ machine_learning/**
 !machine_learning/*/*/data/raw/**
 *.pyc
 __pycache__/
+.env
